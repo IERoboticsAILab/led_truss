@@ -28,23 +28,31 @@ def read_mode(mode_id: int, wait_ms: int):
         truss.glow(Color(0,255,0), wait_ms)
     return 0
 
+def percentage_change(current,previous):
+    if current and previous:
+       return round((current/previous)-1*100,2)
+
 @app.get("/bitcoin")
 def bitcoin():
     # defining key/request url 
     key = "https://api.binance.com/api/v3/ticker/price?symbol=BTCEUR"
     # define a starting price
     previous_price = 0
+    price_change = 0
 
     while True:
         # requesting data from url 
         data = requests.get(key) 
         data = data.json() 
         current_price = int(float(data['price']))
+    
+        if previous_price is not 0:
+            price_change = percentage_change(current_price,previous_price)
 
         if current_price >= previous_price:
-            truss.glow(Color(0,255,0))
+            truss.glow(Color(0,255,0), 10 - price_change)
         else:
-            truss.glow(Color(255,0,0))
+            truss.glow(Color(255,0,0), 10 - price_change)
 
         previous_price = current_price
         time.sleep(10)
