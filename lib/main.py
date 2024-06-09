@@ -106,24 +106,24 @@ class truss:
 
     ## Displays random pixels across the display (one color)
     def sparkle(self, color, wait_ms=50, cummulative=False):
-        self.set_color_all(Color(0, 0, 0)) # there must be a better way to do this
+        self.clear_all()
         for i in range (0, self.LED_COUNT):
             self.strip.setPixelColor(random.randrange(0, self.LED_COUNT), color)
             self.strip.show()
             time.sleep(wait_ms / 1000.0)
             if cummulative:
-                self.set_color_all(Color(0, 0, 0))
+                self.clear_all()
         time.sleep(wait_ms / 1000.0)
 
     ## Displays random pixels across the display (multiple colors)
     def sparkle_multicolor(self, wait_ms=50, cummulative=False):
-        self.set_color_all(Color(0, 0, 0))
+        self.clear_all()
         for i in range (0, self.LED_COUNT):
             self.strip.setPixelColor(random.randrange(0, self.LED_COUNT), Color(random.randrange(0, 256), random.randrange(0, 256), random.randrange(0, 256)))
             self.strip.show()
             time.sleep(wait_ms / 1000.0)
             if cummulative:
-                self.set_color_all(Color(0, 0, 0))
+                self.clear_all()
         time.sleep(wait_ms / 1000.0)
 
     ## Draw rainbow that fades across all pixels at once
