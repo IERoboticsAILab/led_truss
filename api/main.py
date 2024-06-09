@@ -67,6 +67,6 @@ def bitcoin():
                 truss.glow(Color(255,0,0), 10)
 
         previous_price = current_price
-        time.sleep(time_threshold_in_secs)
+        time.sleep(1)
 
     return 0
