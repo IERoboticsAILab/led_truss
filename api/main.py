@@ -39,29 +39,38 @@ def percentage_change(previous, current):
 def bitcoin():
     # defining key/request url 
     key = "https://api.binance.com/api/v3/ticker/price?symbol=BTCEUR"
+    
     # define a starting price
     previous_price = 0
-    price_change = 0
+    price_change_percentage = 0
+
+    # define a time threshold
+    time_threshold_in_secs = 10 
 
     while True:
         # requesting data from url 
         data = requests.get(key) 
         data = data.json() 
         current_price = int(float(data['price']))
-    
+        timeout = time.time() + time_threshold_in_secs
+
         if previous_price is not 0:
-            price_change = percentage_change(current_price,previous_price)
+            price_change_percentage = percentage_change(current_price,previous_price)
 
         truss.clear_all()
 
         if current_price >= previous_price:
-            for i in range(5):
-                truss.glow(Color(0,255,0))
+            while True:
+                truss.glow(Color(0,255,0), 10)
+                if time.time() > timeout:
+                     break
         else:
-            for i in range(5):
-                truss.glow(Color(255,0,0))
+            while True:
+                truss.glow(Color(255,0,0), 10)
+                if time.time() > timeout:
+                    break
 
         previous_price = current_price
-        time.sleep(10)
-
+        time.sleep(time_threshold_in_secs)
+        
     return 0
