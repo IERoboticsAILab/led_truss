@@ -52,7 +52,7 @@ def bitcoin():
         if previous_price is not 0:
             price_change = percentage_change(current_price,previous_price)
 
-        print(current_price, previous_price, price_change)
+        truss.clear_all()
 
         if current_price >= previous_price:
             for i in range(5):
