@@ -128,7 +128,7 @@ class truss:
         time.sleep(SpeedDelay)
 
     ## Draw rainbow that fades across all pixels at once
-    def rainbow(wait_ms=50, iterations=1):
+    def rainbow(self, wait_ms=50, iterations=1):
         for j in range(256 * iterations):
             for i in range(self.strip.numPixels()):
                 self.strip.setPixelColor(i, wheel((i + j) & 255))
@@ -136,7 +136,7 @@ class truss:
             time.sleep(wait_ms / 1000.0)
 
     ## Draw rainbow that uniformly distributes itself across all pixels
-    def rainbowCycle(wait_ms=50, iterations=5):
+    def rainbowCycle(self, wait_ms=50, iterations=5):
         for j in range(256 * iterations):
             for i in range(self.strip.numPixels()):
                 self.strip.setPixelColor(i, wheel(
@@ -145,7 +145,7 @@ class truss:
             time.sleep(wait_ms / 1000.0)
 
     ## Movie theater light style chaser animation
-    def theaterChase(color, wait_ms=50, iterations=10):
+    def theaterChase(self, color, wait_ms=50, iterations=10):
         for j in range(iterations):
             for q in range(3):
                 for i in range(0, self.strip.numPixels(), 3):
@@ -156,7 +156,7 @@ class truss:
                     self.strip.setPixelColor(i + q, 0)
 
     ## Rainbow movie theater light style chaser animation
-    def theaterChaseRainbow(wait_ms=50):
+    def theaterChaseRainbow(self, wait_ms=50):
         for j in range(256):
             for q in range(3):
                 for i in range(0, self.strip.numPixels(), 3):
@@ -167,10 +167,9 @@ class truss:
                     self.strip.setPixelColor(i + q, 0)
 
 
-    def angry_mode(wait_ms = 5, duration_ms = 3000, width = 1):
+    def angry_mode(self, wait_ms = 5, duration_ms = 3000, width = 1):
         clear_all()
         index = 0
-    
         while duration_ms > 0:
             self.strip.setPixelColor((index - width) % LED_COUNT, Color(0,0,0))
             self.strip.setPixelColor(index, Color(255,0,0))
