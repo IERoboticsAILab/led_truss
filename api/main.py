@@ -55,11 +55,13 @@ def bitcoin():
         print(current_price, previous_price, price_change)
 
         if current_price >= previous_price:
-            truss.glow(Color(0,255,0), 10 - price_change)
+            for i in range(5):
+                truss.glow(Color(0,255,0))
         else:
-            truss.glow(Color(255,0,0), 10 - price_change)
+            for i in range(5):
+                truss.glow(Color(255,0,0))
 
         previous_price = current_price
-        time.sleep(1)
+        time.sleep(10)
 
     return 0
