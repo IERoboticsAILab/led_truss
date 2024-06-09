@@ -44,8 +44,8 @@ def bitcoin():
     previous_price = 0
     price_change_percentage = 0
 
-    # define a time threshold
-    time_threshold_in_secs = 10 
+    # define a time threshold (in secs)
+    time_threshold_in_secs = 30 
 
     while True:
         # requesting data from url 
@@ -58,8 +58,6 @@ def bitcoin():
             price_change_percentage = percentage_change(current_price,previous_price)
 
         truss.clear_all()
-
-        print(current_price, previous_price, price_change_percentage)
 
         if current_price > previous_price:
             while time.time() < timeout:
