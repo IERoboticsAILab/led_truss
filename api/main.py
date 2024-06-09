@@ -1,5 +1,8 @@
 from typing import Union
 from fastapi import FastAPI
+
+import sys
+sys.path.insert(0, '../lib')
 from truss import truss
 from rpi_ws281x import Color
 
