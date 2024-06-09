@@ -59,13 +59,13 @@ def bitcoin():
 
         truss.clear_all()
 
-        if current_price >= previous_price:
+        if current_price > previous_price:
             while time.time() < timeout:
                 truss.glow(Color(0,255,0), 10)
-        else:
+        if current_price < previous_price:
             while time.time() < timeout:
                 truss.glow(Color(255,0,0), 10)
-
+  
         previous_price = current_price
         time.sleep(1)
 
