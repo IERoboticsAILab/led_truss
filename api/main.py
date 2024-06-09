@@ -6,6 +6,11 @@ sys.path.insert(0, '../lib')
 from truss import truss
 from rpi_ws281x import Color
 
+
+import time
+import json 
+import requests 
+
 app = FastAPI()
 truss = truss()
 
@@ -23,8 +28,24 @@ def read_mode(mode_id: int, wait_ms: int):
         truss.glow(Color(0,255,0), wait_ms)
     return 0
 
-@app.get("/bitcoin/{mode_id}")
-def read_mode(mode_id: int):
-    if mode_id == 0:
-        truss.glow(Color(0,255,0),10)
+@app.get("/bitcoin")
+def bitcoin():
+    # defining key/request url 
+    key = "https://api.binance.com/api/v3/ticker/price?symbol=BTCEUR"
+    # define a starting price
+    previous_price = 0
+
+    while True:
+        # requesting data from url 
+        data = requests.get(key) 
+        data = data.json() 
+
+        if data[price] >= previous_price:
+            truss.glow(Color(0,255,0))
+        else:
+            truss.glow(Color(255,0,0))
+
+        previous_price = data[price]
+        time.sleep(10)
+
     return 0
