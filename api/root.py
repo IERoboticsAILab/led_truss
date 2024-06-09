@@ -2,15 +2,10 @@ from typing import Union
 from fastapi import FastAPI
 
 import sys
-
-sys.path.insert(0, '/root/led_truss/')
-import main
-
-import time
-import math
-from rpi_ws281x import *
+from ..lib import main
 
 app = FastAPI()
+truss = truss()
 
 @app.get("/")
 def read_root():
@@ -22,11 +17,6 @@ def read_item(item_id: int, q: Union[str, None] = None):
 
 @app.get("/mode/{mode_id}")
 def read_mode(mode_id: int):
-
     if mode_id == 0:
-        main.rainbow()
-    if mode_id == 1:
-        color = Color(0,0,255)
-        main.glow(color,0.01)
-
+        truss.rainbow()
     return 0
