@@ -79,7 +79,7 @@ class truss:
 
     # Vizualtion effects
     ## Glowing effect
-    def glow(self, color, wait_ms=1):
+    def glow(self, color, wait_ms=10):
         #Fade In.
         for i in range (0, 256):
             r = int(math.floor((i / 256.0) * color.r))

@@ -1,8 +1,7 @@
 from typing import Union
 from fastapi import FastAPI
-
-import sys
-from main import truss
+from truss import truss
+from rpi_ws281x import Color
 
 app = FastAPI()
 truss = truss()
@@ -18,5 +17,5 @@ def read_item(item_id: int, q: Union[str, None] = None):
 @app.get("/mode/{mode_id}")
 def read_mode(mode_id: int):
     if mode_id == 0:
-        truss.rainbow()
+        truss.glow(Color(0,255,0),10)
     return 0
