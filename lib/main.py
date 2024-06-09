@@ -51,7 +51,7 @@ class truss:
             pos -= 170
             return Color(0, pos * 3, 255 - pos * 3)
         
-    ## Sets colors based on star and end percentages of the strip
+    ## Sets colors based on star and end percentages of the strip (from 0 to 1)
     def set_color_range_percent(self, color, start_percent, end_percent):
         start_index = int(self.LED_COUNT * start_percent)
         end_index = int(self.LED_COUNT * end_percent)
@@ -97,8 +97,8 @@ class truss:
             self.strip.show()
             time.sleep(wait_ms / 1000.0)
 
-    ## Wipe color across display a pixel at a time
-    def colorWipe(self, color, wait_ms=50):
+    ## Wipe color across the display one pixel at a time
+    def color_wipe(self, color, wait_ms=50):
         for i in range(self.strip.numPixels()):
             self.strip.setPixelColor(i, color)
             self.strip.show()
@@ -113,7 +113,7 @@ class truss:
             time.sleep(wait_ms / 1000.0)
             if cummulative:
                 set_color_all(Color(0, 0, 0))
-        time.sleep(SpeedDelay)
+        time.sleep(wait_ms / 1000.0)
 
     ## Displays random pixels across the display (multiple colors)
     def sparkle_multicolor(self, wait_ms=50, cummulative=False):
