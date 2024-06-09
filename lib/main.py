@@ -1,5 +1,6 @@
 import time
 import math
+import random
 from rpi_ws281x import *
 
 LED_COUNT      = 60         # Number of LED pixels.
@@ -55,6 +56,33 @@ def colorWipe(color, wait_ms=50):
         strip.setPixelColor(i, color)
         strip.show()
         time.sleep(wait_ms / 1000.0)
+
+def Twinkle(red, green, blue, Count, SpeedDelay, OnlyOne):
+    set_colour_all(Color(0, 0, 0))
+    for i in range (0, Count):
+        strip.setPixelColor(random.randrange(0, LED_COUNT), Color(red, green, blue))
+        strip.show()
+        time.sleep(SpeedDelay)
+        if OnlyOne:
+            set_colour_all(Color(0, 0, 0))
+    time.sleep(SpeedDelay)
+
+def TwinkleRandom(Count, SpeedDelay, OnlyOne):
+    set_colour_all(Color(0, 0, 0))
+    for i in range (0, Count):
+        strip.setPixelColor(random.randrange(0, LED_COUNT), Color(random.randrange(0, 256), random.randrange(0, 256), random.randrange(0, 256)))
+        strip.show()
+        time.sleep(SpeedDelay)
+        if OnlyOne:
+            set_colour_all(Color(0, 0, 0))
+    time.sleep(SpeedDelay)
+
+def Sparkle(red, green, blue, SpeedDelay):
+    pixel=random.randrange(0, LED_COUNT)
+    strip.setPixelColor(pixel, Color(red, green, blue))
+    strip.show()
+    time.sleep(SpeedDelay)
+    strip.setPixelColor(pixel, Color(0, 0, 0))
 
 def theaterChase(color, wait_ms=50, iterations=10):
     """Movie theater light style chaser animation."""
