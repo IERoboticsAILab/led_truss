@@ -40,12 +40,12 @@ def bitcoin():
         data = requests.get(key) 
         data = data.json() 
 
-        if data[price] >= previous_price:
+        if data['price'] >= previous_price:
             truss.glow(Color(0,255,0))
         else:
             truss.glow(Color(255,0,0))
 
-        previous_price = data[price]
+        previous_price = data['price']
         time.sleep(10)
 
     return 0
