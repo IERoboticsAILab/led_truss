@@ -39,13 +39,14 @@ def bitcoin():
         # requesting data from url 
         data = requests.get(key) 
         data = data.json() 
+        current_price = int(float(data['price']))
 
-        if int(data['price']) >= previous_price:
+        if current_price >= previous_price:
             truss.glow(Color(0,255,0))
         else:
             truss.glow(Color(255,0,0))
 
-        previous_price = int(data['price'])
+        previous_price = current_price
         time.sleep(10)
 
     return 0
