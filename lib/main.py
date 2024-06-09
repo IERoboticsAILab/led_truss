@@ -22,23 +22,23 @@ class truss:
                                   LED_CHANNEL)
 
     def __init__(self):
-        strip.begin()
+        self.strip.begin()
 
     # Auxiliary Functions
     def set_white_all(self):
         for i in range(LED_COUNT):
-            strip.setPixelColor(i, Color(255,255,255))
-        strip.show()
+            self.strip.setPixelColor(i, Color(255,255,255))
+        self.strip.show()
 
     def set_color_all(self, color):
         for i in range(LED_COUNT):
-            strip.setPixelColor(i, color)
-        strip.show()
+            self.strip.setPixelColor(i, color)
+        self.strip.show()
 
     def clear_all(self):
         for i in range(LED_COUNT):
-            strip.setPixelColor(i, Color(0,0,0))
-        strip.show()
+            self.strip.setPixelColor(i, Color(0,0,0))
+        self.strip.show()
 
     ## Generate rainbow colors across 0-255 positions 
     def wheel(self, pos):
@@ -62,9 +62,9 @@ class truss:
             index_range = LED_COUNT - end_index + start_index
 
         for i in range(index_range):
-            strip.setPixelColor((start_index + i)%LED_COUNT, color)
+            self.strip.setPixelColor((start_index + i)%LED_COUNT, color)
 
-        strip.show()
+        self.strip.show()
 
     ## Sets colors based on star and end index of the strip
     def set_color_range_exact(self, color, start_index, end_index):
@@ -74,9 +74,9 @@ class truss:
             index_range = LED_COUNT - end_index + start_index
 
         for i in range(index_range):
-            strip.setPixelColor((start_index + i)%LED_COUNT, color)
+            self.strip.setPixelColor((start_index + i)%LED_COUNT, color)
 
-        strip.show()
+        self.strip.show()
 
     # Vizualtion effects
     ## Glowing effect
@@ -87,7 +87,7 @@ class truss:
             g = int(math.floor((i / 256.0) * color.g))
             b = int(math.floor((i / 256.0) * color.b))
             set_color_all(Color(r, g, b))
-            strip.show()
+            self.strip.show()
             time.sleep(wait_ms / 1000.0)
         #Fade Out.
         for i in range (256, 0, -1):
@@ -95,22 +95,22 @@ class truss:
             g = int(math.floor((i / 256.0) * color.g))
             b = int(math.floor((i / 256.0) * color.b))
             set_color_all(Color(r, g, b))
-            strip.show()
+            self.strip.show()
             time.sleep(wait_ms / 1000.0)
 
     ## Wipe color across display a pixel at a time
     def colorWipe(self, color, wait_ms=50):
-        for i in range(strip.numPixels()):
-            strip.setPixelColor(i, color)
-            strip.show()
+        for i in range(self.strip.numPixels()):
+            self.strip.setPixelColor(i, color)
+            self.strip.show()
             time.sleep(wait_ms / 1000.0)
 
     ## Displays random pixels across the display (one color)
     def sparkle(self, color, wait_ms=50, cummulative=False):
         set_color_all(Color(0, 0, 0)) # there must be a better way to do this
         for i in range (0, LED_COUNT):
-            strip.setPixelColor(random.randrange(0, LED_COUNT), color)
-            strip.show()
+            self.strip.setPixelColor(random.randrange(0, LED_COUNT), color)
+            self.strip.show()
             time.sleep(wait_ms / 1000.0)
             if cummulative:
                 set_color_all(Color(0, 0, 0))
@@ -120,8 +120,8 @@ class truss:
     def sparkle_multicolor(self, wait_ms=50, cummulative=False):
         set_color_all(Color(0, 0, 0))
         for i in range (0, LED_COUNT):
-            strip.setPixelColor(random.randrange(0, LED_COUNT), Color(random.randrange(0, 256), random.randrange(0, 256), random.randrange(0, 256)))
-            strip.show()
+            self.strip.setPixelColor(random.randrange(0, LED_COUNT), Color(random.randrange(0, 256), random.randrange(0, 256), random.randrange(0, 256)))
+            self.strip.show()
             time.sleep(wait_ms / 1000.0)
             if cummulative:
                 set_color_all(Color(0, 0, 0))
@@ -130,41 +130,41 @@ class truss:
     ## Draw rainbow that fades across all pixels at once
     def rainbow(wait_ms=50, iterations=1):
         for j in range(256 * iterations):
-            for i in range(strip.numPixels()):
-                strip.setPixelColor(i, wheel((i + j) & 255))
-            strip.show()
+            for i in range(self.strip.numPixels()):
+                self.strip.setPixelColor(i, wheel((i + j) & 255))
+            self.strip.show()
             time.sleep(wait_ms / 1000.0)
 
     ## Draw rainbow that uniformly distributes itself across all pixels
     def rainbowCycle(wait_ms=50, iterations=5):
         for j in range(256 * iterations):
-            for i in range(strip.numPixels()):
-                strip.setPixelColor(i, wheel(
-                    (int(i * 256 / strip.numPixels()) + j) & 255))
-            strip.show()
+            for i in range(self.strip.numPixels()):
+                self.strip.setPixelColor(i, wheel(
+                    (int(i * 256 / self.strip.numPixels()) + j) & 255))
+            self.strip.show()
             time.sleep(wait_ms / 1000.0)
 
     ## Movie theater light style chaser animation
     def theaterChase(color, wait_ms=50, iterations=10):
         for j in range(iterations):
             for q in range(3):
-                for i in range(0, strip.numPixels(), 3):
-                    strip.setPixelColor(i + q, color)
-                strip.show()
+                for i in range(0, self.strip.numPixels(), 3):
+                    self.strip.setPixelColor(i + q, color)
+                self.strip.show()
                 time.sleep(wait_ms / 1000.0)
-                for i in range(0, strip.numPixels(), 3):
-                    strip.setPixelColor(i + q, 0)
+                for i in range(0, self.strip.numPixels(), 3):
+                    self.strip.setPixelColor(i + q, 0)
 
     ## Rainbow movie theater light style chaser animation
     def theaterChaseRainbow(wait_ms=50):
         for j in range(256):
             for q in range(3):
-                for i in range(0, strip.numPixels(), 3):
-                    strip.setPixelColor(i + q, wheel((i + j) % 255))
-                strip.show()
+                for i in range(0, self.strip.numPixels(), 3):
+                    self.strip.setPixelColor(i + q, wheel((i + j) % 255))
+                self.strip.show()
                 time.sleep(wait_ms / 1000.0)
-                for i in range(0, strip.numPixels(), 3):
-                    strip.setPixelColor(i + q, 0)
+                for i in range(0, self.strip.numPixels(), 3):
+                    self.strip.setPixelColor(i + q, 0)
 
 
     def angry_mode(wait_ms = 5, duration_ms = 3000, width = 1):
@@ -172,9 +172,9 @@ class truss:
         index = 0
     
         while duration_ms > 0:
-            strip.setPixelColor((index - width) % LED_COUNT, Color(0,0,0))
-            strip.setPixelColor(index, Color(255,0,0))
-            strip.show()
+            self.strip.setPixelColor((index - width) % LED_COUNT, Color(0,0,0))
+            self.strip.setPixelColor(index, Color(255,0,0))
+            self.strip.show()
             index = (index + 1) % LED_COUNT
             duration_ms -= wait_ms
             time.sleep(wait_ms / 1000)

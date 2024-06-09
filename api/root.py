@@ -2,7 +2,7 @@ from typing import Union
 from fastapi import FastAPI
 
 import sys
-from ..lib import main
+from main import truss
 
 app = FastAPI()
 truss = truss()
