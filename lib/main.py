@@ -112,7 +112,7 @@ class truss:
             self.strip.show()
             time.sleep(wait_ms / 1000.0)
             if cummulative:
-                set_color_all(Color(0, 0, 0))
+                self.set_color_all(Color(0, 0, 0))
         time.sleep(wait_ms / 1000.0)
 
     ## Displays random pixels across the display (multiple colors)
