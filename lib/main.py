@@ -106,7 +106,7 @@ class truss:
             time.sleep(wait_ms / 1000.0)
 
     ## Displays random pixels across the display (one color)
-    def sparkle(self, color, wait_ms=50, cummulative=false):
+    def sparkle(self, color, wait_ms=50, cummulative=False):
         set_color_all(Color(0, 0, 0)) # there must be a better way to do this
         for i in range (0, LED_COUNT):
             strip.setPixelColor(random.randrange(0, LED_COUNT), color)
@@ -117,7 +117,7 @@ class truss:
         time.sleep(SpeedDelay)
 
     ## Displays random pixels across the display (multiple colors)
-    def sparkle_multicolor(self, wait_ms=50, cummulative=false):
+    def sparkle_multicolor(self, wait_ms=50, cummulative=False):
         set_color_all(Color(0, 0, 0))
         for i in range (0, LED_COUNT):
             strip.setPixelColor(random.randrange(0, LED_COUNT), Color(random.randrange(0, 256), random.randrange(0, 256), random.randrange(0, 256)))
