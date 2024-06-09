@@ -28,9 +28,12 @@ def read_mode(mode_id: int, wait_ms: int):
         truss.glow(Color(0,255,0), wait_ms)
     return 0
 
-def percentage_change(current,previous):
-    if current and previous:
-       return round((current/previous)-1*100,2)
+def percentage_change(previous, current):
+    try:
+        percentage = abs(previous - current)/((previous + current)/2) * 100
+    except ZeroDivisionError:
+        percentage = float('inf')
+    return percentage
 
 @app.get("/bitcoin")
 def bitcoin():
@@ -54,10 +57,8 @@ def bitcoin():
         else:
             truss.glow(Color(255,0,0), 10 - price_change)
 
-        previous_price = current_price
-
         print(current_price, previous_price, price_change)
-
+        previous_price = current_price
         time.sleep(10)
 
     return 0
