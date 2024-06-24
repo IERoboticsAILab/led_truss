@@ -25,6 +25,10 @@ class truss:
         self.strip.begin()
 
     # Auxiliary Functions
+    def set_pixel_color(self, pixel_index, color):
+        self.strip.setPixelColor(pixel_index, color)
+        self.strip.show()
+
     def set_white_all(self):
         for i in range(self.LED_COUNT):
             self.strip.setPixelColor(i, Color(255,255,255))
@@ -39,6 +43,8 @@ class truss:
         for i in range(self.LED_COUNT):
             self.strip.setPixelColor(i, Color(0,0,0))
         self.strip.show()
+        
+
 
     ## Generate rainbow colors across 0-255 positions 
     def wheel(self, pos):
