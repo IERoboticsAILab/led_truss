@@ -122,7 +122,7 @@ class truss:
             self.strip.setPixelColor(random.randrange(0, self.LED_COUNT), Color(random.randrange(0, 256), random.randrange(0, 256), random.randrange(0, 256)))
             self.strip.show()
             time.sleep(wait_ms / 1000.0)
-            if cummulative:
+            if not cummulative:
                 self.clear_all()
         time.sleep(wait_ms / 1000.0)
 
