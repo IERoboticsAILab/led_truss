@@ -5,7 +5,7 @@ from rpi_ws281x import *
 
 class truss:
 
-    LED_COUNT      = 60         # Number of LED pixels.
+    LED_COUNT      = 600         # Number of LED pixels.
     LED_PIN        = 18         # GPIO pin connected to the pixels (18 uses PWM!).
     LED_FREQ_HZ    = 800000     # LED signal frequency in hertz (usually 800khz)
     LED_DMA        = 10         # DMA channel to use for generating a signal (try 10)
@@ -166,7 +166,7 @@ class truss:
                 for i in range(0, self.strip.numPixels(), 3):
                     self.strip.setPixelColor(i + q, 0)
 
-    def running(self, wait_ms = 10, duration_ms = 3000, width = 1):
+    def running(self, wait_ms = 10, duration_ms = 6000, width = 1):
         self.clear_all()
         index = 0
         while duration_ms > 0:
