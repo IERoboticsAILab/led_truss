@@ -5,15 +5,16 @@ from rpi_ws281x import *
 
 class truss:
 
-    LED_COUNT      = 600         # Number of LED pixels.
-    LED_PIN        = 18         # GPIO pin connected to the pixels (18 uses PWM!).
-    LED_FREQ_HZ    = 800000     # LED signal frequency in hertz (usually 800khz)
-    LED_DMA        = 10         # DMA channel to use for generating a signal (try 10)
-    LED_BRIGHTNESS = 65         # Set to 0 for darkest and 255 for brightest
-    LED_INVERT     = False      # True to invert the signal (when using NPN transistor level shift)
-    LED_CHANNEL    = 0          # set to '1' for GPIOs 13, 19, 41, 45 or 53
+    def __init__(self, count=300, pin=18, freq=800000, dma=10, brightness=25, invert=False, channel=0):
+        self.LED_COUNT      = count      # Number of LED pixels.
+        self.LED_PIN        = pin        # GPIO pin connected to the pixels (18 uses PWM!).
+        self.LED_FREQ_HZ    = freq     # LED signal frequency in hertz (usually 800khz)
+        self.LED_DMA        = dma         # DMA channel to use for generating a signal (try 10)
+        self.LED_BRIGHTNESS = brightness         # Set to 0 for darkest and 255 for brightest
+        self.LED_INVERT     = invert      # True to invert the signal (when using NPN transistor level shift)
+        self.LED_CHANNEL    = channel    # set to '1' for GPIOs 13, 19, 41, 45 or 53
 
-    strip = Adafruit_NeoPixel(LED_COUNT, 
+        self.strip = Adafruit_NeoPixel(LED_COUNT, 
                                   LED_PIN, 
                                   LED_FREQ_HZ, 
                                   LED_DMA, 
@@ -21,7 +22,7 @@ class truss:
                                   LED_BRIGHTNESS, 
                                   LED_CHANNEL)
 
-    def __init__(self):
+
         self.strip.begin()
 
     # Auxiliary Functions
@@ -44,8 +45,6 @@ class truss:
             self.strip.setPixelColor(i, Color(0,0,0))
         self.strip.show()
         
-
-
     ## Generate rainbow colors across 0-255 positions 
     def wheel(self, pos):
         if pos < 85:
@@ -57,7 +56,7 @@ class truss:
             pos -= 170
             return Color(0, pos * 3, 255 - pos * 3)
         
-    ## Sets colors based on star and end percentages of the strip (from 0 to 1)
+    ## Sets colors based on starting and end percentages of the strip (from 0 to 1)
     def set_color_range_percent(self, color, start_percent, end_percent):
         start_index = int(self.LED_COUNT * start_percent)
         end_index = int(self.LED_COUNT * end_percent)
