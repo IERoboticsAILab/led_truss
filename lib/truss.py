@@ -42,9 +42,11 @@ class truss:
             pixel_index_new = pixel_index_new - (self.LED_COUNT/2) 
             self.strip2.setPixelColor(pixel_index_new, color)
         
+        self.truss_show()
+        
+    def truss_show(self):
         self.strip1.show()
         self.strip2.show()
-
 
     # Auxiliary Functions
     def set_pixel_color(self, pixel_index, color):
