@@ -4,26 +4,47 @@ import random
 from rpi_ws281x import *
 
 class truss:
+    def __init__(self, count=1800, pin=18, freq=800000, dma=10, brightness=25, invert=False, channel=0):
+        self.LED_COUNT      = 1800        # Number of LED pixels.
+        self.LED_PIN        = None         # GPIO pin connected to the pixels (18 uses PWM!).
+        self.LED_FREQ_HZ    = 800000      # LED signal frequency in hertz (usually 800khz)
+        self.LED_DMA        = 10         # DMA channel to use for generating a signal (try 10)
+        self.LED_BRIGHTNESS = 65         # Set to 0 for darkest and 255 for brightest
+        self.LED_INVERT     = False      # True to invert the signal (when using NPN transistor level shift)
+        self.LED_CHANNEL    = None     # set to '1' for GPIOs 13, 19, 41, 45 or 53
 
-    def __init__(self, count=300, pin=18, freq=800000, dma=10, brightness=25, invert=False, channel=0):
-        self.LED_COUNT      = count      # Number of LED pixels.
-        self.LED_PIN        = pin        # GPIO pin connected to the pixels (18 uses PWM!).
-        self.LED_FREQ_HZ    = freq     # LED signal frequency in hertz (usually 800khz)
-        self.LED_DMA        = dma         # DMA channel to use for generating a signal (try 10)
-        self.LED_BRIGHTNESS = brightness         # Set to 0 for darkest and 255 for brightest
-        self.LED_INVERT     = invert      # True to invert the signal (when using NPN transistor level shift)
-        self.LED_CHANNEL    = channel    # set to '1' for GPIOs 13, 19, 41, 45 or 53
+        self.strip1 = Adafruit_NeoPixel(900, 
+                                  18, 
+                                  800000, 
+                                  10, 
+                                  False, 
+                                  65, 
+                                  0)
 
-        self.strip = Adafruit_NeoPixel(self.LED_COUNT, 
-                                  self.LED_PIN, 
-                                  self.LED_FREQ_HZ, 
-                                  self.LED_DMA, 
-                                  self.LED_INVERT, 
-                                  self.LED_BRIGHTNESS, 
-                                  self.LED_CHANNEL)
+        self.strip2 = Adafruit_NeoPixel(900, 
+                                  13, 
+                                  800000, 
+                                  10, 
+                                  False, 
+                                  65, 
+                                  1)
 
 
-        self.strip.begin()
+        self.strip1.begin()
+        self.strip2.begin()
+
+    # Auxiliary Functions
+    def set_pixel_color_truss(self, pixel_index, color):
+        if pixel_index < (self.LED_COUNT/2):
+            pixel_index_new = ((self.LED_COUNT/2) - 1) - pixel_index
+            self.strip1.setPixelColor(pixel_index_new, color)
+        else: 
+            pixel_index_new = pixel_index_new - (self.LED_COUNT/2) 
+            self.strip2.setPixelColor(pixel_index_new, color)
+        
+        self.strip1.show()
+        self.strip2.show()
+
 
     # Auxiliary Functions
     def set_pixel_color(self, pixel_index, color):
