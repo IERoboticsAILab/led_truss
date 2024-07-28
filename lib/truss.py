@@ -1,5 +1,6 @@
 import time
 import math
+import numpy as np
 import random
 from rpi_ws281x import *
 
@@ -100,21 +101,14 @@ class truss:
 
     # Vizualtion effects
     ## Glowing effect
-    def glow(self, color, wait_ms=10):
-        #Fade In.
-        for i in range (0, 256):
-            r = int(math.floor((i / 256.0) * color.r))
-            g = int(math.floor((i / 256.0) * color.g))
-            b = int(math.floor((i / 256.0) * color.b))
-            self.set_color_all(Color(r, g, b))
-            self.show()
-            time.sleep(wait_ms / 1000.0)
-        #Fade Out.
-        for i in range (256, 0, -1):
-            r = int(math.floor((i / 256.0) * color.r))
-            g = int(math.floor((i / 256.0) * color.g))
-            b = int(math.floor((i / 256.0) * color.b))
-            self.set_color_all(Color(r, g, b))
+    def glow(self, color, frames, wait_ms=10):
+        cos_lookup = (np.cos(np.linspace(np.pi, np.pi*3, frames)) + 1) * 0.5
+        color_lookup = np.tile(np.array([255], dtype=np.uint8), [frames, self.LED_COUNT])
+        cos_color_table = np.multiply(color_lookup, cos_lookup[:, np.newaxis],).astype(np.uint8)
+
+        for f in range(0, frames):
+            for i in range (0, self.LED_COUNT):
+                self.set_pixel_color(i, Color(cos_color_table[f][i],0,0))
             self.show()
             time.sleep(wait_ms / 1000.0)
 
