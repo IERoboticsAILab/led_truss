@@ -57,6 +57,10 @@ class truss:
             self.set_pixel_color(i, color)
         self.show()
 
+    def set_brightness(self, brightness):
+        self.strip1.setBrightness(brightness)
+        self.strip2.setBrightness(brightness)
+
     def clear_all(self):
         for i in range(self.LED_COUNT):
             self.set_pixel_color(i, Color(0,0,0))
