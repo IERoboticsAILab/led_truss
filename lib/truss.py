@@ -13,7 +13,7 @@ class truss:
         self.LED_INVERT     = False      # True to invert the signal (when using NPN transistor level shift)
         self.LED_CHANNEL    = None       # set to '1' for GPIOs 13, 19, 41, 45 or 53
 
-        self.strip1 = Adafruit_NeoPixel(self.LED_COUNT/2, 
+        self.strip1 = Adafruit_NeoPixel(int(self.LED_COUNT/2), 
                                   18, 
                                   self.LED_FREQ_HZ, 
                                   self.LED_DMA, 
@@ -21,7 +21,7 @@ class truss:
                                   self.LED_BRIGHTNESS, 
                                   0)
 
-        self.strip2 = Adafruit_NeoPixel(self.LED_COUNT/2, 
+        self.strip2 = Adafruit_NeoPixel(int(self.LED_COUNT/2), 
                                   13, 
                                   self.LED_FREQ_HZ, 
                                   self.LED_DMA, 
