@@ -5,7 +5,7 @@ import random
 from rpi_ws281x import *
 
 class truss:
-    def __init__(self, count=1800, freq=800000, dma=10, brightness=65):
+    def __init__(self, count=1800, freq=800000, dma=10, brightness=100):
         self.LED_COUNT      = count      # Number of LED pixels.
         self.LED_PIN        = None       # GPIO pin connected to the pixels (18 uses PWM!).
         self.LED_FREQ_HZ    = freq       # LED signal frequency in hertz (usually 800khz)
@@ -101,14 +101,29 @@ class truss:
 
     # Vizualtion effects
     ## Glowing effect
-    def glow(self, color, frames, wait_ms=10):
+    def glow(self, color, frames=300, wait_ms=10):
         cos_lookup = (np.cos(np.linspace(np.pi, np.pi*3, frames)) + 1) * 0.5
-        color_lookup = np.tile(np.array([255], dtype=np.uint8), [frames, self.LED_COUNT])
-        cos_color_table = np.multiply(color_lookup, cos_lookup[:, np.newaxis],).astype(np.uint8)
+        color_lookup = np.tile(np.array((color.r, color.g, color.b), dtype=np.uint8), [frames, self.LED_COUNT])
+        cos_color_table = np.multiply(color_lookup, cos_lookup[:, np.newaxis],).astype(int)
+        
+        for f in range(frames):
+            for i in range(self.LED_COUNT):
+                c = Color(cos_color_table[f][i*3], cos_color_table[f][(i*3)+1], cos_color_table[f][(i*3)+2])
+                self.set_pixel_color(i, c)
+            self.show()
+            time.sleep(wait_ms / 1000.0)
 
-        for f in range(0, frames):
-            for i in range (0, self.LED_COUNT):
-                self.set_pixel_color(i, Color(cos_color_table[f][i],0,0))
+    ## Sends moving cosine waves (with amplitude 1) throughtout the LEDs
+    def wave(self, color, frames=300, cycles=1, speed=0.1, wait_ms=10):
+        for i in range(frames):
+            cos_lookup = (np.cos(np.linspace(np.pi-(i*speed), (np.pi*(cycles*3))-(i*speed), self.LED_COUNT)) + 1) * 0.5
+            color_lookup = np.tile(np.array((color.r, color.g, color.b), dtype=np.uint8), [self.LED_COUNT, 1])
+            cos_color_table = np.multiply(color_lookup, cos_lookup[:, np.newaxis],).astype(int)
+        
+            for i in range(self.LED_COUNT):
+                c = Color(cos_color_table[i][0], cos_color_table[i][1], cos_color_table[i][2])
+                self.set_pixel_color(i, c)
+            
             self.show()
             time.sleep(wait_ms / 1000.0)
 
