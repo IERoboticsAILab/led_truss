@@ -3,6 +3,9 @@ import math
 import numpy as np
 import random
 from rpi_ws281x import *
+import requests
+import threading
+
 
 class truss:
     def __init__(self, count=1800, freq=800000, dma=10, brightness=100):
@@ -33,6 +36,7 @@ class truss:
 
         self.strip1.begin()
         self.strip2.begin()
+        self.stop_event = threading.Event()
 
     # Auxiliary Functions
     def set_pixel_color(self, pixel_index, color):
@@ -64,6 +68,8 @@ class truss:
     def clear_all(self):
         for i in range(self.LED_COUNT):
             self.set_pixel_color(i, Color(0,0,0))
+        
+        self.stop_event.set()
         self.show()
         
     ## Generate rainbow colors across 0-255 positions 
@@ -230,3 +236,45 @@ class truss:
             index = (index + 1) % self.LED_COUNT
             duration_ms -= wait_ms
             time.sleep(wait_ms / 1000)
+
+    def percentage_change(previous, current):
+        try:
+            percentage = abs(previous - current)/((previous + current)/2) * 100
+        except ZeroDivisionError:
+            percentage = float('inf')
+        return percentage
+
+    def bitcoin(self):
+        # defining key/request url 
+        key = "https://api.binance.com/api/v3/ticker/price?symbol=BTCEUR"
+        
+        # define a starting price
+        previous_price = 0
+        price_change_percentage = 0
+
+        # define a time threshold (in secs)
+        time_threshold_in_secs = 30 
+
+        while not self.stop_event.is_set():
+            # requesting data from url 
+            data = requests.get(key) 
+            data = data.json() 
+            current_price = int(float(data['price']))
+            timeout = time.time() + time_threshold_in_secs
+
+            if previous_price is not 0:
+                price_change_percentage = self.percentage_change(current_price,previous_price)
+
+            self.clear_all()
+
+            if current_price > previous_price:
+                while time.time() < timeout:
+                    truss.glow(Color(0,255,0))
+            if current_price < previous_price:
+                while time.time() < timeout:
+                    truss.glow(Color(255,0,0))
+
+            previous_price = current_price
+            time.sleep(1)
+
+        return 0
