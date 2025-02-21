@@ -8,7 +8,6 @@ import time
 import requests
 
 # MQTT Configuration
-BROKER = "10.205.10.7"
 TOPIC_PREFIX = "home/truss"
 
 # Initialize Truss Instance
@@ -78,5 +77,5 @@ mqttc.on_connect = on_connect
 mqttc.on_message = on_message
 
 mqttc.username_pw_set("mqtt", "123456789")
-mqttc.connect(BROKER, 1883, 60)
+mqttc.connect("10.205.10.7", 1883, 60)
 mqttc.loop_forever()
