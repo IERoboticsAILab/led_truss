@@ -21,55 +21,49 @@ def on_connect(client, userdata, flags, rc):
     else:
         print(f"Failed to connect, error code: {rc}")
 
+# Define a dictionary to map effect names to functions
+EFFECT_MAP = {
+    "Rainbow": truss.rainbow,
+    "Rainbow Cycle": truss.rainbow_cycle,
+    "Sparkle": lambda color: truss.sparkle(Color(color['r'], color['g'], color['b'])),
+    "Sparkle Multicolor": truss.sparkle_multicolor,
+    "Theater Chase": lambda color: truss.theater_chase(Color(color['r'], color['g'], color['b'])),
+    "Theater Chase Rainbow": truss.theater_chase_rainbow,
+    "Glow": lambda color: truss.glow(Color(color['r'], color['g'], color['b'])),
+    "Wave": lambda color: truss.wave(Color(color['r'], color['g'], color['b'])),
+    "Color Wipe": lambda color: truss.color_wipe(Color(color['r'], color['g'], color['b'])),
+    "Bitcoin": truss.bitcoin,
+    "Running": truss.running
+}
+
 def on_message(client, userdata, msg):
     payload = msg.payload.decode()
     try:
         received_message = json.loads(payload)
-        command = received_message.get("command")
-        value = received_message.get("value", None)
+        state = received_message.get("state")
+        brightness = received_message.get("brightness")
+        color = received_message.get("color")
+        effect = received_message.get("effect")
 
-        print(f"Received message: {received_message} on topic: {msg.topic}")
+        if state == "ON":
+            truss.show()
+            if brightness is not None:
+                truss.set_brightness(int(brightness))
+            if color is not None:
+                truss.set_color_all(Color(color['r'], color['g'], color['b']))
+            if effect in EFFECT_MAP:
+                if "color" in received_message and callable(EFFECT_MAP[effect]):  
+                    EFFECT_MAP[effect](received_message["color"])  # Pass color if needed
+                else:
+                    EFFECT_MAP[effect]()  # Call function without parameters
+        elif state == "OFF":
+            truss.clear_all()
 
-        # Ensure value is a proper list of RGB values
-        def parse_color(value):
-            if isinstance(value, list) and len(value) == 3:
-                return Color(value[0], value[1], value[2])
-            return None
-
-        # Command Mapping
-        command_map = {
-            "ON": truss.show,
-            "OFF": truss.clear_all,
-            "WHITE_ALL": lambda: truss.set_color_all(Color(255, 255, 255)),
-            "COLOR_ALL": lambda: truss.set_color_all(parse_color(value)) if value else None,
-            "BRIGHTNESS": lambda: truss.set_brightness(value) if value else None,
-            "COLOR_WIPE": lambda: truss.color_wipe(parse_color(value)) if value else truss.color_wipe(Color(255, 0, 0)),
-            "RAINBOW": truss.rainbow,
-            "RAINBOW_CYCLE": truss.rainbow_cycle,
-            "SPARKLE": lambda: truss.sparkle(parse_color(value)) if value else truss.sparkle(Color(255, 255, 255)),
-            "SPARKLE_MULTICOLOR": truss.sparkle_multicolor,
-            "THEATER_CHASE": lambda: truss.theater_chase(parse_color(value)) if value else truss.theater_chase(Color(0, 255, 0)),
-            "THEATER_CHASE_RAINBOW": truss.theater_chase_rainbow,
-            "GLOW": lambda: truss.glow(parse_color(value)) if value else truss.glow(Color(255, 0, 255)),
-            "WAVE": lambda: truss.wave(parse_color(value)) if value else truss.wave(Color(0, 255, 255)),
-            "COLOR_FADE": lambda: truss.color_fade(parse_color(value[0]), parse_color(value[1])) if value and len(value) == 2 else None,
-            "SET_COLOR_RANGE_PERCENT": lambda: truss.set_color_range_percent(parse_color(value[0]), value[1], value[2]) if value and len(value) == 3 else None,
-            "SET_COLOR_RANGE_EXACT": lambda: truss.set_color_range_exact(parse_color(value[0]), value[1], value[2]) if value and len(value) == 3 else None,
-            "RUNNING": truss.running,  # Running effect
-            "BITCOIN": truss.bitcoin,
-            }
-
-        if command in command_map:
-            command_map[command]()
-            client.publish(f"{TOPIC_PREFIX}/status", json.dumps({"status": "OK", "command": command}))
-            print(f"Command {command} executed successfully")
-        else:
-            print(f"Unknown command: {command}")
-            client.publish(f"{TOPIC_PREFIX}/status", json.dumps({"status": "ERROR", "command": command}))
+        # Publish state back to Home Assistant
+        client.publish(f"{TOPIC_PREFIX}/state", json.dumps(received_message), qos=1, retain=True)
 
     except Exception as e:
-        print(f"Error processing message: {e}")
-        client.publish(f"{TOPIC_PREFIX}/status", json.dumps({"status": "ERROR", "command": command}))
+        print(f"Error processing message: {e}")      
 
 # MQTT Setup
 mqttc = mqtt.Client()
@@ -78,4 +72,14 @@ mqttc.on_message = on_message
 
 mqttc.username_pw_set("mqtt", "123456789")
 mqttc.connect("10.205.10.7", 1883, 60)
-mqttc.loop_forever()
+
+# Start MQTT loop in a separate thread
+mqttc.loop_start()
+
+try:
+    while True:
+        time.sleep(1)  # Keep main thread alive
+except KeyboardInterrupt:
+    print("Disconnecting MQTT...")
+    mqttc.loop_stop()  # Stop the MQTT loop
+    mqttc.disconnect()  # Disconnect cleanly
