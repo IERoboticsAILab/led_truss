@@ -66,7 +66,6 @@ class truss:
         for i in range(self.LED_COUNT):
             self.set_pixel_color(i, Color(0,0,0))
         
-        self.stop_event.set()
         self.show()
         
     ## Generate rainbow colors across 0-255 positions 
