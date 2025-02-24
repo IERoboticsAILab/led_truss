@@ -4,8 +4,6 @@ import numpy as np
 import random
 from rpi_ws281x import *
 import requests
-import threading
-
 
 class truss:
     def __init__(self, count=1800, freq=800000, dma=10, brightness=100):
@@ -36,7 +34,6 @@ class truss:
 
         self.strip1.begin()
         self.strip2.begin()
-        self.stop_event = threading.Event()
 
     # Auxiliary Functions
     def set_pixel_color(self, pixel_index, color):
@@ -255,7 +252,7 @@ class truss:
         # define a time threshold (in secs)
         time_threshold_in_secs = 30 
 
-        while not self.stop_event.is_set():
+        
             # requesting data from url 
             data = requests.get(key) 
             data = data.json() 
