@@ -253,25 +253,25 @@ class truss:
         time_threshold_in_secs = 30 
 
         
-            # requesting data from url 
-            data = requests.get(key) 
-            data = data.json() 
-            current_price = int(float(data['price']))
-            timeout = time.time() + time_threshold_in_secs
+        # requesting data from url 
+        data = requests.get(key) 
+        data = data.json() 
+        current_price = int(float(data['price']))
+        timeout = time.time() + time_threshold_in_secs
 
-            if previous_price is not 0:
-                price_change_percentage = self.percentage_change(current_price,previous_price)
+        if previous_price is not 0:
+            price_change_percentage = self.percentage_change(current_price,previous_price)
 
-            self.clear_all()
+        self.clear_all()
 
-            if current_price > previous_price:
-                while time.time() < timeout:
-                    truss.glow(Color(0,255,0))
-            if current_price < previous_price:
-                while time.time() < timeout:
-                    truss.glow(Color(255,0,0))
+        if current_price > previous_price:
+            while time.time() < timeout:
+                truss.glow(Color(0,255,0))
+        if current_price < previous_price:
+            while time.time() < timeout:
+                truss.glow(Color(255,0,0))
 
-            previous_price = current_price
-            time.sleep(1)
+        previous_price = current_price
+        time.sleep(1)
 
         return 0
