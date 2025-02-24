@@ -80,7 +80,7 @@ def on_message(client, userdata, msg):
             print(f"Received command: {received_message}")
             
             state = received_message.get("state")
-            brightness = received_message.get("brightness", 125)  # Default to 125 if not set
+            brightness = received_message.get("brightness", 255)  # Default to 125 if not set
             color = received_message.get("color", {"r": 255, "g": 255, "b": 255})  # Default to white if not set
             effect = received_message.get("effect")
 
