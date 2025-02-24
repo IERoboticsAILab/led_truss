@@ -112,5 +112,7 @@ if __name__ == '__main__':
 
     except KeyboardInterrupt:
         print("Clearing LEDs")
-        strip.clear()
         colorWipe(strip, Color(0,0,0), 10)
+        strip.clear()
+        strip.show()
+        
