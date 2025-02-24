@@ -65,7 +65,6 @@ EFFECT_MAP = {
     "Color Wipe": lambda color: print(f"Color Wipe, color: {color}"),#truss.color_wipe(Color(color['r'], color['g'], color['b'])),
     "Bitcoin": print("Bitcoin"),#truss.bitcoin,
     "Running": print("Running"),#truss.running,
-    "Solid": lambda color: truss.solid(Color(color['r'], color['g'], color['b']))
 }
 
 def on_message(client, userdata, msg):
