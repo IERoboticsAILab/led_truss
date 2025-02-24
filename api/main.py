@@ -1,9 +1,9 @@
 import json
 import paho.mqtt.client as mqtt
-#from rpi_ws281x import Color
+from rpi_ws281x import Color
 import sys
-# sys.path.insert(0, '../lib')
-# from lib.truss import truss
+sys.path.insert(0, '../lib')
+from lib.truss import truss
 import time
 import requests
 
@@ -38,7 +38,7 @@ class State:
             self.effect = None
 
 # Initialize Truss Instance and State
-# truss = truss()
+truss = truss()
 current_state = State()
 
 # MQTT Callbacks
@@ -64,7 +64,8 @@ EFFECT_MAP = {
     "Wave": lambda color: print(f"Wave, color: {color}"),#truss.wave(Color(color['r'], color['g'], color['b'])),
     "Color Wipe": lambda color: print(f"Color Wipe, color: {color}"),#truss.color_wipe(Color(color['r'], color['g'], color['b'])),
     "Bitcoin": print("Bitcoin"),#truss.bitcoin,
-    "Running": print("Running")#truss.running
+    "Running": print("Running"),#truss.running,
+    "Solid": lambda color: truss.solid(Color(color['r'], color['g'], color['b']))
 }
 
 def on_message(client, userdata, msg):
@@ -98,13 +99,13 @@ def on_message(client, userdata, msg):
 
                 else: 
                     print(f"Setting brightness to {brightness}")
-                    #truss.set_brightness(brightness)
+                    truss.set_brightness(brightness)
                     
                     print(f"Setting color to {color}")
-                    #truss.set_color_all(Color(color['r'], color['g'], color['b']))
+                    truss.set_color_all(Color(color['r'], color['g'], color['b']))
             else:
                 print("Clearing all")
-                #truss.clear_all()
+                truss.clear_all()
                 current_state.state = "OFF"
 
         # Always publish state for both /command and /state topics
