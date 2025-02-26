@@ -12,10 +12,10 @@ TOPIC_PREFIX = "home/truss"
 
 class State:
     def __init__(self):
-        self.state = "OFF"
         self.brightness = 125
         self.color = {"r": 255, "g": 255, "b": 255}  # Default white
         self.effect = None
+        self.state = "OFF"
 
     def to_dict(self):
         return {
@@ -54,17 +54,17 @@ def on_connect(client, userdata, flags, rc):
 
 # Define a dictionary to map effect names to functions
 EFFECT_MAP = {
-    "Rainbow": print("Rainbow"),#truss.rainbow,
-    "Rainbow Cycle": print("Rainbow Cycle"),#truss.rainbow_cycle,
-    "Sparkle": lambda color: print(f"Sparkle, color: {color}"),#truss.sparkle(Color(color['r'], color['g'], color['b'])),
-    "Sparkle Multicolor": print("Sparkle Multicolor"),#truss.sparkle_multicolor,
-    "Theater Chase": lambda color: print(f"Theater Chase, color: {color}"),#truss.theater_chase(Color(color['r'], color['g'], color['b'])),
-    "Theater Chase Rainbow": print("Theater Chase Rainbow"),#truss.theater_chase_rainbow,
-    "Glow": lambda color: print(f"Glow, color: {color}"),#truss.glow(Color(color['r'], color['g'], color['b'])),
-    "Wave": lambda color: print(f"Wave, color: {color}"),#truss.wave(Color(color['r'], color['g'], color['b'])),
-    "Color Wipe": lambda color: print(f"Color Wipe, color: {color}"),#truss.color_wipe(Color(color['r'], color['g'], color['b'])),
-    "Bitcoin": print("Bitcoin"),#truss.bitcoin,
-    "Running": print("Running"),#truss.running,
+    "Rainbow": truss.rainbow,
+    "Rainbow Cycle": truss.rainbow_cycle,
+    "Sparkle": lambda color: truss.sparkle(Color(color['r'], color['g'], color['b'])),
+    "Sparkle Multicolor": truss.sparkle_multicolor,
+    "Theater Chase": lambda color: truss.theater_chase(Color(color['r'], color['g'], color['b'])),
+    "Theater Chase Rainbow": truss.theater_chase_rainbow,
+    "Glow": lambda color: truss.glow(Color(color['r'], color['g'], color['b'])),
+    "Wave": lambda color: truss.wave(Color(color['r'], color['g'], color['b'])),
+    "Color Wipe": lambda color: truss.color_wipe(Color(color['r'], color['g'], color['b'])),
+    "Bitcoin": truss.bitcoin,
+    "Running": truss.running,
 }
 
 def on_message(client, userdata, msg):
@@ -79,29 +79,42 @@ def on_message(client, userdata, msg):
         if msg.topic == f"{TOPIC_PREFIX}/command":
             print(f"Received command: {received_message}")
             
-            state = received_message.get("state")
-            brightness = received_message.get("brightness", 255)  # Default to 125 if not set
-            color = received_message.get("color", {"r": 255, "g": 255, "b": 255})  # Default to white if not set
-            effect = received_message.get("effect")
+            state = received_message.get("state", current_state.state)
+            brightness = received_message.get("brightness", current_state.brightness)  # Default to 125 if not set
+            color = received_message.get("color", current_state.color)  # Default to white if not set
+            effect = received_message.get("effect", current_state.effect)
 
             # Update the state object
             current_state.update(state, brightness, color, effect)
 
             if state == "ON":
-                if effect in EFFECT_MAP:
-                    if "color" in received_message and callable(EFFECT_MAP[effect]):
-                        print(f"Running effect: {effect} with color")
-                        EFFECT_MAP[effect](color)
-                    else:
-                        print(f"Running effect: {effect}")
-                        EFFECT_MAP[effect]
-
-                else: 
+                if brightness:
                     print(f"Setting brightness to {brightness}")
                     truss.set_brightness(brightness)
-                    
+                    current_state.brightness = brightness
+                else:
+                    truss.set_brightness(current_state.brightness)
+
+                if color:
                     print(f"Setting color to {color}")
                     truss.set_color_all(Color(color['r'], color['g'], color['b']))
+                    current_state.color = color
+                else:
+                    truss.set_color_all(Color(current_state.color['r'], current_state.color['g'], current_state.color['b']))
+
+                if effect:
+                    if effect in EFFECT_MAP:
+                        if "color" in received_message and callable(EFFECT_MAP[effect]):
+                            print(f"Running effect: {effect} with color")
+                            EFFECT_MAP[effect](current_state.color)
+                            current_state.effect = effect
+                        else:
+                            print(f"Running effect: {effect}")
+                            EFFECT_MAP[effect]
+                            current_state.effect = effect
+                    else:
+                        print(f"Effect {effect} not found")
+                
             else:
                 print("Clearing all")
                 truss.clear_all()
