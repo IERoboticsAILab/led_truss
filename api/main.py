@@ -17,23 +17,6 @@ truss = truss()
 def read_root():
     return {"Hello": "World"}
 
-@app.get("/items/{item_id}")
-def read_item(item_id: int, q: Union[str, None] = None):
-    return {"item_id": item_id, "q": q}
-
-@app.get("/mode/{mode_id}")
-def read_mode(mode_id: int, wait_ms: int):
-    if mode_id == 0:
-        truss.glow(Color(0,255,0), wait_ms)
-    return 0
-
-def percentage_change(previous, current):
-    try:
-        percentage = abs(previous - current)/((previous + current)/2) * 100
-    except ZeroDivisionError:
-        percentage = float('inf')
-    return percentage
-
 @app.get("/bitcoin")
 def bitcoin():
     # defining key/request url 
