@@ -4,7 +4,7 @@ from rpi_ws281x import Color
 
 import sys
 sys.path.insert(0, '../lib')
-from truss import truss
+from lib.truss import truss
 
 import time
 import json 
