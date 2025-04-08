@@ -12,6 +12,8 @@ import requests
 
 app = FastAPI()
 truss = truss()
+truss.set_brightness(255)
+truss.glow(Color(255,255,255))
 
 @app.get("/")
 def read_root():
