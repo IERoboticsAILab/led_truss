@@ -4,7 +4,7 @@ from rpi_ws281x import Color
 
 import sys
 sys.path.insert(0, '../lib')
-from lib.truss import truss, percentage_change
+from lib.truss import truss
 
 import time
 import json 
@@ -19,7 +19,7 @@ def read_root():
     return {"Hello": "World"}
 
 @app.get("/bitcoin")
-def bitcoin():
+def bitcoin(duration: Optional[int] = 60):  # 1 minute default duration
     # defining key/request url 
     key = "https://api.binance.com/api/v3/ticker/price?symbol=BTCEUR"
     
@@ -28,8 +28,11 @@ def bitcoin():
 
     # define a time threshold (in secs)
     time_threshold_in_secs = 30 
+    
+    # Calculate end time for the entire function
+    total_end_time = time.time() + duration
 
-    while True:
+    while time.time() < total_end_time:
         # requesting data from url 
         data = requests.get(key) 
         data = data.json() 
@@ -47,7 +50,10 @@ def bitcoin():
   
         previous_price = current_price
         time.sleep(1)
-    return 0
+    
+    # Clear the lights when done
+    truss.clear_all()
+    return {"status": "success"}
 
 # Visualization Effects Endpoints
 @app.get("/glow")
