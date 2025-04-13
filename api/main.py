@@ -4,7 +4,7 @@ from rpi_ws281x import Color
 
 import sys
 sys.path.insert(0, '../lib')
-from lib.truss import truss
+from lib.truss import truss, percentage_change
 
 import time
 import json 
@@ -25,7 +25,6 @@ def bitcoin():
     
     # define a starting price
     previous_price = 0
-    price_change_percentage = 0
 
     # define a time threshold (in secs)
     time_threshold_in_secs = 30 
@@ -36,9 +35,6 @@ def bitcoin():
         data = data.json() 
         current_price = int(float(data['price']))
         timeout = time.time() + time_threshold_in_secs
-
-        if previous_price is not 0:
-            price_change_percentage = percentage_change(current_price,previous_price)
 
         truss.clear_all()
 
