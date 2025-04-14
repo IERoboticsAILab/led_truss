@@ -6,10 +6,6 @@ import sys
 sys.path.insert(0, '../lib')
 from lib.truss import truss
 
-import time
-import json 
-import requests 
-
 app = FastAPI()
 truss = truss()
 truss.clear_all()
