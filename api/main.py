@@ -16,8 +16,8 @@ def read_root():
 
 @app.get("/bitcoin")
 def bitcoin(duration: int = 60, time_threshold_in_secs: int = 30):
-    return truss.bitcoin(duration, time_threshold_in_secs)
-
+    truss.bitcoin(duration, time_threshold_in_secs)
+    return {"status": "success"}
 # Visualization Effects Endpoints
 @app.get("/glow")
 def glow_effect(color: Tuple[int, int, int] = (255, 255, 255), frames: int = 300, wait_ms: int = 10):
