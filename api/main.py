@@ -18,7 +18,7 @@ def read_root():
 def bitcoin(duration: int = 60, time_threshold_in_secs: int = 30):
     truss.bitcoin(duration, time_threshold_in_secs)
     return {"status": "success"}
-# Visualization Effects Endpoints
+
 @app.get("/glow")
 def glow_effect(color: Tuple[int, int, int] = (255, 255, 255), frames: int = 300, wait_ms: int = 10):
     truss.glow(Color(*color), frames, wait_ms)
@@ -78,13 +78,11 @@ def clear_all():
     return {"status": "success"}
 
 @app.get("/set-color")
-def set_color_all(color: Tuple[int, int, int] = (255, 255, 255)):
-    truss.set_color_all(Color(*color))
-    return {"status": "success"}
-
-@app.get("/set-white")
-def set_white_all():
-    truss.set_white_all()
+def set_color_all(color: Optional[Tuple[int, int, int]] = None):
+    if color is None:
+        truss.set_white_all()
+    else:
+        truss.set_color_all(Color(*color))
     return {"status": "success"}
 
 @app.get("/set-brightness")
