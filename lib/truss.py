@@ -1,7 +1,7 @@
 import time
-import math
 import numpy as np
 import random
+import requests
 from rpi_ws281x import *
 
 class truss:
@@ -230,3 +230,39 @@ class truss:
             index = (index + 1) % self.LED_COUNT
             duration_ms -= wait_ms
             time.sleep(wait_ms / 1000)
+
+
+    def bitcoin(self, duration = 60, time_threshold_in_secs = 30):
+        """Monitor Bitcoin price and show changes on the LED truss.
+        
+        Args:
+            duration (int): Total duration to monitor in seconds
+            time_threshold_in_secs (int): How long to show each price change
+            
+        Returns:
+            dict: Status of the operation
+        """
+        key = "https://api.binance.com/api/v3/ticker/price?symbol=BTCEUR"
+        previous_price = 0
+        total_end_time = time.time() + duration
+
+        while time.time() < total_end_time:
+            # Get current Bitcoin price
+            data = requests.get(key, timeout=5).json()
+            current_price = float(data['price'])
+
+            # Show price change visualization
+            timeout = time.time() + time_threshold_in_secs
+
+            if current_price > previous_price:
+                while time.time() < timeout:
+                    self.glow(Color(0, 255, 0))  # Green for price increase
+            elif current_price < previous_price:
+                while time.time() < timeout:
+                    self.glow(Color(255, 0, 0))  # Red for price decrease
+            else:
+                while time.time() < timeout:
+                    self.glow(Color(255, 255, 255))  # White for no change
+            
+            previous_price = current_price
+        

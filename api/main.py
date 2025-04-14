@@ -19,41 +19,8 @@ def read_root():
     return {"Hello": "World"}
 
 @app.get("/bitcoin")
-def bitcoin(duration: Optional[int] = 60):  # 1 minute default duration
-    # defining key/request url 
-    key = "https://api.binance.com/api/v3/ticker/price?symbol=BTCEUR"
-    
-    # define a starting price
-    previous_price = 0
-
-    # define a time threshold (in secs)
-    time_threshold_in_secs = 30 
-    
-    # Calculate end time for the entire function
-    total_end_time = time.time() + duration
-
-    while time.time() < total_end_time:
-        # requesting data from url 
-        data = requests.get(key) 
-        data = data.json() 
-        current_price = int(float(data['price']))
-        timeout = time.time() + time_threshold_in_secs
-
-        truss.clear_all()
-
-        if current_price > previous_price:
-            while time.time() < timeout:
-                truss.glow(Color(0,255,0))
-        if current_price < previous_price:
-            while time.time() < timeout:
-                truss.glow(Color(255,0,0))
-  
-        previous_price = current_price
-        time.sleep(1)
-    
-    # Clear the lights when done
-    truss.clear_all()
-    return {"status": "success"}
+def bitcoin(duration: int = 60, time_threshold_in_secs: int = 30):
+    return truss.bitcoin(duration, time_threshold_in_secs)
 
 # Visualization Effects Endpoints
 @app.get("/glow")
