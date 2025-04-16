@@ -1,0 +1,261 @@
+{
+  "bitcoin": {
+    "description": "Monitor Bitcoin price and show changes with color indicators",
+    "params": {
+      "duration": {
+        "type": "int",
+        "description": "Total duration to monitor in seconds",
+        "default": 60
+      },
+      "time_threshold_in_secs": {
+        "type": "int",
+        "description": "How long to show each price change",
+        "default": 30
+      }
+    }
+  },
+  "glow": {
+    "description": "Creates a pulsing glow effect with specified color",
+    "params": {
+      "color": {
+        "type": "tuple[int, int, int]",
+        "description": "RGB color values",
+        "default": [255, 255, 255]
+      },
+      "frames": {
+        "type": "int",
+        "description": "Number of animation frames",
+        "default": 300
+      },
+      "wait_ms": {
+        "type": "int",
+        "description": "Delay between frames in milliseconds",
+        "default": 10
+      }
+    }
+  },
+  "wave": {
+    "description": "Creates moving cosine waves through the LED strip",
+    "params": {
+      "color": {
+        "type": "tuple[int, int, int]",
+        "description": "RGB color values",
+        "default": [255, 255, 255]
+      },
+      "frames": {
+        "type": "int",
+        "description": "Number of animation frames",
+        "default": 300
+      },
+      "cycles": {
+        "type": "int",
+        "description": "Number of wave cycles",
+        "default": 1
+      },
+      "speed": {
+        "type": "float",
+        "description": "Wave movement speed",
+        "default": 0.1
+      },
+      "wait_ms": {
+        "type": "int",
+        "description": "Delay between frames in milliseconds",
+        "default": 10
+      }
+    }
+  },
+  "color_wipe": {
+    "description": "Wipes a color across the display pixel by pixel",
+    "params": {
+      "color": {
+        "type": "tuple[int, int, int]",
+        "description": "RGB color values",
+        "default": [255, 255, 255]
+      },
+      "wait_ms": {
+        "type": "int",
+        "description": "Delay between pixels in milliseconds",
+        "default": 50
+      }
+    }
+  },
+  "color_fade": {
+    "description": "Fades from one color to another across all LEDs",
+    "params": {
+      "color_from": {
+        "type": "tuple[int, int, int]",
+        "description": "Starting RGB color",
+        "default": [0, 0, 0]
+      },
+      "color_to": {
+        "type": "tuple[int, int, int]",
+        "description": "Ending RGB color",
+        "default": [255, 255, 255]
+      },
+      "wait_ms": {
+        "type": "int",
+        "description": "Delay between steps in milliseconds",
+        "default": 20
+      },
+      "steps": {
+        "type": "int",
+        "description": "Number of color steps in the fade",
+        "default": 100
+      }
+    }
+  },
+  "sparkle": {
+    "description": "Creates a sparkling effect with random pixels",
+    "params": {
+      "color": {
+        "type": "tuple[int, int, int]",
+        "description": "RGB color values (optional - if not provided, uses multicolor)",
+        "default": null
+      },
+      "wait_ms": {
+        "type": "int",
+        "description": "Delay between sparkles in milliseconds",
+        "default": 50
+      },
+      "cummulative": {
+        "type": "boolean",
+        "description": "Whether sparkles accumulate or clear between iterations",
+        "default": false
+      }
+    }
+  },
+  "rainbow": {
+    "description": "Creates a rainbow effect that fades across all pixels",
+    "params": {
+      "wait_ms": {
+        "type": "int",
+        "description": "Delay between updates in milliseconds",
+        "default": 50
+      },
+      "iterations": {
+        "type": "int",
+        "description": "Number of complete rainbow cycles",
+        "default": 1
+      }
+    }
+  },
+  "rainbow_cycle": {
+    "description": "Creates a rainbow effect that uniformly distributes across pixels",
+    "params": {
+      "wait_ms": {
+        "type": "int",
+        "description": "Delay between updates in milliseconds",
+        "default": 50
+      },
+      "iterations": {
+        "type": "int",
+        "description": "Number of complete rainbow cycles",
+        "default": 5
+      }
+    }
+  },
+  "theater_chase": {
+    "description": "Creates a theater chase effect (moving dots)",
+    "params": {
+      "color": {
+        "type": "tuple[int, int, int]",
+        "description": "RGB color values (optional - if not provided, uses rainbow)",
+        "default": null
+      },
+      "wait_ms": {
+        "type": "int",
+        "description": "Delay between moves in milliseconds",
+        "default": 50
+      },
+      "iterations": {
+        "type": "int",
+        "description": "Number of complete chase cycles",
+        "default": 10
+      }
+    }
+  },
+  "running": {
+    "description": "Creates a running light effect",
+    "params": {
+      "wait_ms": {
+        "type": "int",
+        "description": "Delay between moves in milliseconds",
+        "default": 10
+      },
+      "duration_ms": {
+        "type": "int",
+        "description": "Total duration of effect in milliseconds",
+        "default": 18000
+      },
+      "width": {
+        "type": "int",
+        "description": "Width of the running light in pixels",
+        "default": 1
+      }
+    }
+  },
+  "clear": {
+    "description": "Clears all LEDs (turns them off)",
+    "params": {}
+  },
+  "set_color": {
+    "description": "Sets all LEDs to a specific color or white if no color provided",
+    "params": {
+      "color": {
+        "type": "tuple[int, int, int]",
+        "description": "RGB color values (optional - if not provided, uses white)",
+        "default": null
+      }
+    }
+  },
+  "set_brightness": {
+    "description": "Sets the overall brightness of the LED strips",
+    "params": {
+      "brightness": {
+        "type": "int",
+        "description": "Brightness value (0-255)",
+        "default": 125
+      }
+    }
+  },
+  "set_color_range_percent": {
+    "description": "Sets a color for a range of LEDs specified by percentages",
+    "params": {
+      "color": {
+        "type": "tuple[int, int, int]",
+        "description": "RGB color values",
+        "default": [255, 255, 255]
+      },
+      "start_percent": {
+        "type": "float",
+        "description": "Starting position as percentage (0.0-1.0)",
+        "default": 0.0
+      },
+      "end_percent": {
+        "type": "float",
+        "description": "Ending position as percentage (0.0-1.0)",
+        "default": 1.0
+      }
+    }
+  },
+  "set_color_range_exact": {
+    "description": "Sets a color for a range of LEDs specified by exact indices",
+    "params": {
+      "color": {
+        "type": "tuple[int, int, int]",
+        "description": "RGB color values",
+        "default": [255, 255, 255]
+      },
+      "start_index": {
+        "type": "int",
+        "description": "Starting LED index",
+        "default": 0
+      },
+      "end_index": {
+        "type": "int",
+        "description": "Ending LED index",
+        "default": 1800
+      }
+    }
+  }
+} 

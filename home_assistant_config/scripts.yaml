@@ -1,0 +1,9 @@
+run_led_effect:
+  alias: Run LED Effect
+  sequence:
+    - service: rest_command.send_led_effect
+  icon: mdi:play-circle-outline
+
+# Placeholder script needed by the template light's set_level service
+do_nothing:
+  sequence: [] 

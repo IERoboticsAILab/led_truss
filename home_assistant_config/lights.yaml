@@ -1,0 +1,54 @@
+- platform: template
+  lights:
+    led_truss_color_picker:
+      friendly_name: "LED Truss Color Picker"
+      unique_id: led_truss_color_picker_template_light
+      value_template: "{{ states('input_number.led_color_r')|int(0) > 0 or states('input_number.led_color_g')|int(0) > 0 or states('input_number.led_color_b')|int(0) > 0 }}"
+      level_template: "{{ 255 if states('input_number.led_color_r')|int(0) > 0 or states('input_number.led_color_g')|int(0) > 0 or states('input_number.led_color_b')|int(0) > 0 else 0 }}"
+      rgb_template: "{{ [states('input_number.led_color_r')|int(0), states('input_number.led_color_g')|int(0), states('input_number.led_color_b')|int(0)] }}"
+
+      turn_on:
+        # If color is black (0,0,0) when turn_on is called, set inputs to white (255,255,255)
+        # Otherwise, the color is already set via set_rgb, so do nothing extra here.
+        - condition: template
+          value_template: >
+            {{ states('input_number.led_color_r')|int(0) == 0 and
+               states('input_number.led_color_g')|int(0) == 0 and
+               states('input_number.led_color_b')|int(0) == 0 }}
+        - service: input_number.set_value
+          target:
+            entity_id:
+              - input_number.led_color_r
+              - input_number.led_color_g
+              - input_number.led_color_b
+          data:
+            value: 255 # Set R, G, B inputs to 255
+      turn_off:
+        - service: input_number.set_value
+          target:
+            entity_id:
+              - input_number.led_color_r
+              - input_number.led_color_g
+              - input_number.led_color_b
+          data:
+            value: 0
+      set_level:
+        # We need the service call defined, but our automations handle sync
+        - service: script.do_nothing # Defined in scripts.yaml
+      set_rgb:
+        # This updates the input numbers when the color picker UI is used
+        - service: input_number.set_value
+          target:
+            entity_id: input_number.led_color_r
+          data:
+            value: "{{ r }}"
+        - service: input_number.set_value
+          target:
+            entity_id: input_number.led_color_g
+          data:
+            value: "{{ g }}"
+        - service: input_number.set_value
+          target:
+            entity_id: input_number.led_color_b
+          data:
+            value: "{{ b }}" 
