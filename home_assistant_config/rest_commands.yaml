@@ -1,9 +1,7 @@
 send_led_effect:
   # IMPORTANT: Replace <YOUR_PI_IP> with the actual IP address of your Raspberry Pi
-  url: >
-    http://<YOUR_PI_IP>:8000/
-    {{ 'control/' if states('input_select.led_effect') in ['clear', 'set-color', 'set-brightness', 'set-color-range-percent', 'set-color-range-exact'] else 'effects/' }}
-    {{ states('input_select.led_effect') }}
+  # Combined URL template into single line to prevent extra spaces (%20)
+  url: "http://<YOUR_PI_IP>:8000/{{ 'control/' if states('input_select.led_effect') in ['clear', 'set-color', 'set-brightness', 'set-color-range-percent', 'set-color-range-exact'] else 'effects/' }}{{ states('input_select.led_effect') }}"
   method: POST
   content_type: "application/json"
   timeout: 10 # Added timeout in seconds
