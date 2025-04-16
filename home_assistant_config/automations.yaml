@@ -1,5 +1,4 @@
 - alias: "LED Truss Sync Color Picker to RGB Inputs"
-  unique_id: led_truss_sync_picker_to_rgb
   description: "Updates RGB input numbers when the helper light color changes"
   trigger:
     - platform: state
@@ -32,7 +31,6 @@
   mode: single # Prevent race conditions if light changes rapidly
 
 - alias: "LED Truss Sync RGB Inputs to Color Picker"
-  unique_id: led_truss_sync_rgb_to_picker
   description: "Updates the helper light color when RGB input numbers change"
   trigger:
     - platform: state
