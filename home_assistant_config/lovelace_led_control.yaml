@@ -26,10 +26,10 @@ cards:
                 state: sparkle
               - condition: state
                 entity: input_select.led_effect
-                state: theater_chase
+                state: theater-chase
               - condition: state
                 entity: input_select.led_effect
-                state: set_color
+                state: set-color
         card:
           type: entities
           # title: Optional Color Mode # Optional title
@@ -46,14 +46,14 @@ cards:
               conditions:
                 - condition: state
                   entity: input_select.led_effect
-                  state: theater_chase
+                  state: theater-chase
               row:
                 entity: input_boolean.led_theater_chase_use_rainbow
             - type: conditional # Only show if set_color is selected
               conditions:
                 - condition: state
                   entity: input_select.led_effect
-                  state: set_color
+                  state: set-color
               row:
                 entity: input_boolean.led_set_color_use_white
 
@@ -66,19 +66,19 @@ cards:
             state_not: bitcoin
           - condition: state
             entity: input_select.led_effect
-            state_not: color_fade # Uses specific from/to colors
+            state_not: color-fade
           - condition: state
             entity: input_select.led_effect
             state_not: rainbow
           - condition: state
             entity: input_select.led_effect
-            state_not: rainbow_cycle
+            state_not: rainbow-cycle
           - condition: state
             entity: input_select.led_effect
             state_not: clear
           - condition: state
             entity: input_select.led_effect
-            state_not: set_brightness
+            state_not: set-brightness
           # AND one of the following OR groups must be true (Handles optional toggles)
           - condition: or
             conditions:
@@ -92,7 +92,7 @@ cards:
             conditions:
               - condition: state
                 entity: input_select.led_effect
-                state_not: theater_chase
+                state_not: theater-chase
               - condition: state # If theater_chase IS selected, rainbow toggle must be OFF
                 entity: input_boolean.led_theater_chase_use_rainbow
                 state: 'off'
@@ -100,7 +100,7 @@ cards:
             conditions:
               - condition: state
                 entity: input_select.led_effect
-                state_not: set_color
+                state_not: set-color
               - condition: state # If set_color IS selected, white toggle must be OFF
                 entity: input_boolean.led_set_color_use_white
                 state: 'off'
@@ -139,7 +139,7 @@ cards:
         conditions:
           - condition: state # Added explicit condition state
             entity: input_select.led_effect
-            state: color_fade
+            state: color-fade
         card:
           type: entities
           title: Color Fade Options
@@ -186,7 +186,7 @@ cards:
         conditions:
           - condition: state # Added explicit condition state
             entity: input_select.led_effect
-            state: color_wipe
+            state: color-wipe
         card:
           type: entities
           title: Color Wipe Options
@@ -225,7 +225,7 @@ cards:
         conditions:
           - condition: state # Added explicit condition state
             entity: input_select.led_effect
-            state: rainbow_cycle
+            state: rainbow-cycle
         card:
           type: entities
           title: Rainbow Cycle Options
@@ -238,7 +238,7 @@ cards:
         conditions:
           - condition: state # Added explicit condition state
             entity: input_select.led_effect
-            state: theater_chase
+            state: theater-chase
         card:
           type: entities
           title: Theater Chase Options
@@ -266,7 +266,7 @@ cards:
         conditions:
           - condition: state # Added explicit condition state
             entity: input_select.led_effect
-            state: set_brightness
+            state: set-brightness
         card:
           type: entities
           title: Brightness Control
@@ -278,7 +278,7 @@ cards:
         conditions:
           - condition: state # Added explicit condition state
             entity: input_select.led_effect
-            state: set_color_range_percent
+            state: set-color-range-percent
         card:
           type: entities
           title: Set Color Range (%)
@@ -292,7 +292,7 @@ cards:
         conditions:
           - condition: state # Added explicit condition state
             entity: input_select.led_effect
-            state: set_color_range_exact
+            state: set-color-range-exact
         card:
           type: entities
           title: Set Color Range (Index)

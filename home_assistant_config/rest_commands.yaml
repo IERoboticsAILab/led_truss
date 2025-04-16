@@ -1,79 +1,91 @@
 send_led_effect:
   # IMPORTANT: Replace <YOUR_PI_IP> with the actual IP address of your Raspberry Pi
-  url: "http://<YOUR_PI_IP>:8000/{{ 'control/' if states('input_select.led_effect') in ['clear', 'set_color', 'set_brightness', 'set_color_range_percent', 'set_color_range_exact'] else 'effects/' }}{{ states('input_select.led_effect') }}"
+  url: >
+    http://<YOUR_PI_IP>:8000/
+    {{ 'control/' if states('input_select.led_effect') in ['clear', 'set-color', 'set-brightness', 'set-color-range-percent', 'set-color-range-exact'] else 'effects/' }}
+    {{ states('input_select.led_effect') }}
   method: POST
   content_type: "application/json"
   timeout: 10 # Added timeout in seconds
   payload: >
+    {# Define base variables #}
     {% set effect = states('input_select.led_effect') %}
-    {% set r = states('input_number.led_color_r') | int %}
-    {% set g = states('input_number.led_color_g') | int %}
-    {% set b = states('input_number.led_color_b') | int %}
-    {% set wait = states('input_number.led_wait_ms') | int %}
-    {% set iterations = states('input_number.led_iterations') | int %}
-    {% set frames = states('input_number.led_frames') | int %}
+    {% set r = states('input_number.led_color_r') | int(0) %}
+    {% set g = states('input_number.led_color_g') | int(0) %}
+    {% set b = states('input_number.led_color_b') | int(0) %}
+    {% set wait = states('input_number.led_wait_ms') | int(50) %}
+    {% set iterations = states('input_number.led_iterations') | int(1) %}
+    {% set frames = states('input_number.led_frames') | int(300) %}
+    {# Initialize an empty list to hold JSON key-value strings #}
     {% set payload_items = [] %}
 
+    {# Conditionally add items to the list using list concatenation - Use hyphens in conditions #}
     {% if effect == 'bitcoin' %}
-      {% set _ = payload_items.append('"duration": ' + (states('input_number.led_duration') | int | string)) %}
-      {% set _ = payload_items.append('"time_threshold_in_secs": ' + (states('input_number.led_time_threshold_in_secs') | int | string)) %}
+      {% set payload_items = payload_items + ['"duration": ' + (states('input_number.led_duration') | int(60) | string)] %}
+      {% set payload_items = payload_items + ['"time_threshold_in_secs": ' + (states('input_number.led_time_threshold_in_secs') | int(30) | string)] %}
     {% elif effect == 'glow' %}
-      {% set _ = payload_items.append('"color": {"r": ' + (r|string) + ', "g": ' + (g|string) + ', "b": ' + (b|string) + '}') %}
-      {% set _ = payload_items.append('"frames": ' + (frames|string)) %}
-      {% set _ = payload_items.append('"wait_ms": ' + (wait|string)) %}
+      {% set payload_items = payload_items + ['"color": {"r": ' + (r|string) + ', "g": ' + (g|string) + ', "b": ' + (b|string) + '}'] %}
+      {% set payload_items = payload_items + ['"frames": ' + (frames|string)] %}
+      {% set payload_items = payload_items + ['"wait_ms": ' + (wait|string)] %}
     {% elif effect == 'wave' %}
-      {% set _ = payload_items.append('"color": {"r": ' + (r|string) + ', "g": ' + (g|string) + ', "b": ' + (b|string) + '}') %}
-      {% set _ = payload_items.append('"frames": ' + (frames|string)) %}
-      {% set _ = payload_items.append('"cycles": ' + (states('input_number.led_cycles') | int | string)) %}
-      {% set _ = payload_items.append('"speed": ' + (states('input_number.led_speed') | float | string)) %}
-      {% set _ = payload_items.append('"wait_ms": ' + (wait|string)) %}
-    {% elif effect == 'color_wipe' %}
-      {% set _ = payload_items.append('"color": {"r": ' + (r|string) + ', "g": ' + (g|string) + ', "b": ' + (b|string) + '}') %}
-      {% set _ = payload_items.append('"wait_ms": ' + (wait|string)) %}
-    {% elif effect == 'color_fade' %}
-      {% set _ = payload_items.append('"color_from": {"r": ' + (states('input_number.led_color_from_r') | int | string) + ', "g": ' + (states('input_number.led_color_from_g') | int | string) + ', "b": ' + (states('input_number.led_color_from_b') | int | string) + '}') %}
-      {% set _ = payload_items.append('"color_to": {"r": ' + (states('input_number.led_color_to_r') | int | string) + ', "g": ' + (states('input_number.led_color_to_g') | int | string) + ', "b": ' + (states('input_number.led_color_to_b') | int | string) + '}') %}
-      {% set _ = payload_items.append('"wait_ms": ' + (wait|string)) %}
-      {% set _ = payload_items.append('"steps": ' + (states('input_number.led_steps') | int | string)) %}
+      {% set payload_items = payload_items + ['"color": {"r": ' + (r|string) + ', "g": ' + (g|string) + ', "b": ' + (b|string) + '}'] %}
+      {% set payload_items = payload_items + ['"frames": ' + (frames|string)] %}
+      {% set payload_items = payload_items + ['"cycles": ' + (states('input_number.led_cycles') | int(1) | string)] %}
+      {% set payload_items = payload_items + ['"speed": ' + (states('input_number.led_speed') | float(0.1) | string)] %}
+      {% set payload_items = payload_items + ['"wait_ms": ' + (wait|string)] %}
+    {% elif effect == 'color-wipe' %}
+      {% set payload_items = payload_items + ['"color": {"r": ' + (r|string) + ', "g": ' + (g|string) + ', "b": ' + (b|string) + '}'] %}
+      {% set payload_items = payload_items + ['"wait_ms": ' + (wait|string)] %}
+    {% elif effect == 'color-fade' %}
+      {% set cf_r = states('input_number.led_color_from_r') | int(0) %}
+      {% set cf_g = states('input_number.led_color_from_g') | int(0) %}
+      {% set cf_b = states('input_number.led_color_from_b') | int(0) %}
+      {% set ct_r = states('input_number.led_color_to_r') | int(255) %}
+      {% set ct_g = states('input_number.led_color_to_g') | int(255) %}
+      {% set ct_b = states('input_number.led_color_to_b') | int(255) %}
+      {% set payload_items = payload_items + ['"color_from": {"r": ' + (cf_r|string) + ', "g": ' + (cf_g|string) + ', "b": ' + (cf_b|string) + '}'] %}
+      {% set payload_items = payload_items + ['"color_to": {"r": ' + (ct_r|string) + ', "g": ' + (ct_g|string) + ', "b": ' + (ct_b|string) + '}'] %}
+      {% set payload_items = payload_items + ['"wait_ms": ' + (wait|string)] %}
+      {% set payload_items = payload_items + ['"steps": ' + (states('input_number.led_steps') | int(100) | string)] %}
     {% elif effect == 'sparkle' %}
       {% if is_state('input_boolean.led_sparkle_use_multicolor', 'off') %}
-        {% set _ = payload_items.append('"color": {"r": ' + (r|string) + ', "g": ' + (g|string) + ', "b": ' + (b|string) + '}') %}
+        {% set payload_items = payload_items + ['"color": {"r": ' + (r|string) + ', "g": ' + (g|string) + ', "b": ' + (b|string) + '}'] %}
       {% endif %}
-      {% set _ = payload_items.append('"wait_ms": ' + (wait|string)) %}
-      {% set _ = payload_items.append('"cummulative": ' + ('true' if is_state('input_boolean.led_cummulative', 'on') else 'false')) %}
+      {% set payload_items = payload_items + ['"wait_ms": ' + (wait|string)] %}
+      {% set payload_items = payload_items + ['"cummulative": ' + ('true' if is_state('input_boolean.led_cummulative', 'on') else 'false')] %}
     {% elif effect == 'rainbow' %}
-      {% set _ = payload_items.append('"wait_ms": ' + (wait|string)) %}
-      {% set _ = payload_items.append('"iterations": ' + (iterations|string)) %}
-    {% elif effect == 'rainbow_cycle' %}
-      {% set _ = payload_items.append('"wait_ms": ' + (wait|string)) %}
-      {% set _ = payload_items.append('"iterations": ' + (iterations|string)) %}
-    {% elif effect == 'theater_chase' %}
+      {% set payload_items = payload_items + ['"wait_ms": ' + (wait|string)] %}
+      {% set payload_items = payload_items + ['"iterations": ' + (iterations|string)] %}
+    {% elif effect == 'rainbow-cycle' %}
+      {% set payload_items = payload_items + ['"wait_ms": ' + (wait|string)] %}
+      {% set payload_items = payload_items + ['"iterations": ' + (iterations|string)] %}
+    {% elif effect == 'theater-chase' %}
       {% if is_state('input_boolean.led_theater_chase_use_rainbow', 'off') %}
-        {% set _ = payload_items.append('"color": {"r": ' + (r|string) + ', "g": ' + (g|string) + ', "b": ' + (b|string) + '}') %}
+        {% set payload_items = payload_items + ['"color": {"r": ' + (r|string) + ', "g": ' + (g|string) + ', "b": ' + (b|string) + '}'] %}
       {% endif %}
-      {% set _ = payload_items.append('"wait_ms": ' + (wait|string)) %}
-      {% set _ = payload_items.append('"iterations": ' + (iterations|string)) %}
+      {% set payload_items = payload_items + ['"wait_ms": ' + (wait|string)] %}
+      {% set payload_items = payload_items + ['"iterations": ' + (iterations|string)] %}
     {% elif effect == 'running' %}
-      {% set _ = payload_items.append('"wait_ms": ' + (wait|string)) %}
-      {% set _ = payload_items.append('"duration_ms": ' + (states('input_number.led_duration_ms') | int | string)) %}
-      {% set _ = payload_items.append('"width": ' + (states('input_number.led_width') | int | string)) %}
+      {% set payload_items = payload_items + ['"wait_ms": ' + (wait|string)] %}
+      {% set payload_items = payload_items + ['"duration_ms": ' + (states('input_number.led_duration_ms') | int(18000) | string)] %}
+      {% set payload_items = payload_items + ['"width": ' + (states('input_number.led_width') | int(1) | string)] %}
     {% elif effect == 'clear' %}
-      {# No payload items needed #}
-    {% elif effect == 'set_color' %}
+      {# No payload items needed, results in {} #}
+    {% elif effect == 'set-color' %}
       {% if is_state('input_boolean.led_set_color_use_white', 'off') %}
-        {% set _ = payload_items.append('"color": {"r": ' + (r|string) + ', "g": ' + (g|string) + ', "b": ' + (b|string) + '}') %}
+        {% set payload_items = payload_items + ['"color": {"r": ' + (r|string) + ', "g": ' + (g|string) + ', "b": ' + (b|string) + '}'] %}
       {% endif %}
-    {% elif effect == 'set_brightness' %}
-      {% set _ = payload_items.append('"brightness": ' + (states('input_number.led_brightness') | int | string)) %}
-    {% elif effect == 'set_color_range_percent' %}
-      {% set _ = payload_items.append('"color": {"r": ' + (r|string) + ', "g": ' + (g|string) + ', "b": ' + (b|string) + '}') %}
-      {% set _ = payload_items.append('"start_percent": ' + (states('input_number.led_start_percent') | float | string)) %}
-      {% set _ = payload_items.append('"end_percent": ' + (states('input_number.led_end_percent') | float | string)) %}
-    {% elif effect == 'set_color_range_exact' %}
-      {% set _ = payload_items.append('"color": {"r": ' + (r|string) + ', "g": ' + (g|string) + ', "b": ' + (b|string) + '}') %}
-      {% set _ = payload_items.append('"start_index": ' + (states('input_number.led_start_index') | int | string)) %}
-      {% set _ = payload_items.append('"end_index": ' + (states('input_number.led_end_index') | int | string)) %}
+    {% elif effect == 'set-brightness' %}
+      {% set payload_items = payload_items + ['"brightness": ' + (states('input_number.led_brightness') | int(125) | string)] %}
+    {% elif effect == 'set-color-range-percent' %}
+      {% set payload_items = payload_items + ['"color": {"r": ' + (r|string) + ', "g": ' + (g|string) + ', "b": ' + (b|string) + '}'] %}
+      {% set payload_items = payload_items + ['"start_percent": ' + (states('input_number.led_start_percent') | float(0.0) | string)] %}
+      {% set payload_items = payload_items + ['"end_percent": ' + (states('input_number.led_end_percent') | float(1.0) | string)] %}
+    {% elif effect == 'set-color-range-exact' %}
+      {% set payload_items = payload_items + ['"color": {"r": ' + (r|string) + ', "g": ' + (g|string) + ', "b": ' + (b|string) + '}'] %}
+      {% set payload_items = payload_items + ['"start_index": ' + (states('input_number.led_start_index') | int(0) | string)] %}
+      {% set payload_items = payload_items + ['"end_index": ' + (states('input_number.led_end_index') | int(1800) | string)] %}
     {% endif %}
 
-    {# Construct the final JSON string #}
+    {# Construct the final JSON string by joining the list items #}
     { {{ payload_items | join(', ') }} } 

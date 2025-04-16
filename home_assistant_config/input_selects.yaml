@@ -4,17 +4,17 @@ led_effect:
     - bitcoin
     - glow
     - wave
-    - color_wipe
-    - color_fade
+    - color-wipe
+    - color-fade
     - sparkle
     - rainbow
-    - rainbow_cycle
-    - theater_chase
+    - rainbow-cycle
+    - theater-chase
     - running
     - clear
-    - set_color
-    - set_brightness
-    - set_color_range_percent
-    - set_color_range_exact
+    - set-color
+    - set-brightness
+    - set-color-range-percent
+    - set-color-range-exact
   initial: glow
   icon: mdi:string-lights 

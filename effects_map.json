@@ -64,7 +64,7 @@
       }
     }
   },
-  "color_wipe": {
+  "color-wipe": {
     "description": "Wipes a color across the display pixel by pixel",
     "params": {
       "color": {
@@ -79,7 +79,7 @@
       }
     }
   },
-  "color_fade": {
+  "color-fade": {
     "description": "Fades from one color to another across all LEDs",
     "params": {
       "color_from": {
@@ -139,7 +139,7 @@
       }
     }
   },
-  "rainbow_cycle": {
+  "rainbow-cycle": {
     "description": "Creates a rainbow effect that uniformly distributes across pixels",
     "params": {
       "wait_ms": {
@@ -154,7 +154,7 @@
       }
     }
   },
-  "theater_chase": {
+  "theater-chase": {
     "description": "Creates a theater chase effect (moving dots)",
     "params": {
       "color": {
@@ -198,7 +198,7 @@
     "description": "Clears all LEDs (turns them off)",
     "params": {}
   },
-  "set_color": {
+  "set-color": {
     "description": "Sets all LEDs to a specific color or white if no color provided",
     "params": {
       "color": {
@@ -208,7 +208,7 @@
       }
     }
   },
-  "set_brightness": {
+  "set-brightness": {
     "description": "Sets the overall brightness of the LED strips",
     "params": {
       "brightness": {
@@ -218,7 +218,7 @@
       }
     }
   },
-  "set_color_range_percent": {
+  "set-color-range-percent": {
     "description": "Sets a color for a range of LEDs specified by percentages",
     "params": {
       "color": {
@@ -238,7 +238,7 @@
       }
     }
   },
-  "set_color_range_exact": {
+  "set-color-range-exact": {
     "description": "Sets a color for a range of LEDs specified by exact indices",
     "params": {
       "color": {
