@@ -1,25 +1,137 @@
-# --- Lovelace View Configuration ---
-# Add this structure to your Lovelace dashboard configuration (e.g., ui-lovelace.yaml or Raw Editor)
-
-title: LED Truss Control
-path: led-truss
-icon: mdi:string-lights
-panel: false
-cards:
-  - type: vertical-stack
+type: sections
+path: ""
+sections:
+  - type: grid
     cards:
-      # --- Effect Selection --- (Top Card)
       - type: entities
-        title: Effect Selection
+        title: Select Effect
         show_header_toggle: false
         entities:
           - input_select.led_effect
-
-      # --- Optional Color Mode Toggles ---
-      # Only shown when relevant effect is selected
       - type: conditional
         conditions:
-          - condition: or # Show this card if ANY of the effects needing a toggle are selected
+          - condition: state
+            entity: input_select.led_effect
+            state: sparkle
+        card:
+          type: entities
+          show_header_toggle: false
+          entities:
+            - entity: input_boolean.led_cummulative
+            - entity: input_number.led_wait_ms
+      - type: conditional
+        conditions:
+          - condition: or
+            conditions:
+              - condition: state
+                entity: input_select.led_effect
+                state: color-wipe
+        card:
+          type: entities
+          show_header_toggle: false
+          entities:
+            - input_number.led_wait_ms
+      - type: conditional
+        conditions:
+          - condition: or
+            conditions:
+              - condition: state
+                entity: input_select.led_effect
+                state: theater-chase
+        card:
+          type: entities
+          show_header_toggle: false
+          entities:
+            - entity: input_number.led_wait_ms
+            - entity: input_number.led_iterations
+      - type: conditional
+        conditions:
+          - condition: state
+            entity: input_select.led_effect
+            state: glow
+        card:
+          type: entities
+          show_header_toggle: false
+          entities:
+            - entity: input_number.led_wait_ms
+            - entity: input_number.led_frames
+      - type: conditional
+        conditions:
+          - condition: state
+            entity: input_select.led_effect
+            state: wave
+        card:
+          type: entities
+          show_header_toggle: false
+          entities:
+            - entity: input_number.led_wait_ms
+            - entity: input_number.led_frames
+            - entity: input_number.led_cycles
+            - entity: input_number.led_speed
+      - type: conditional
+        conditions:
+          - condition: state
+            entity: input_select.led_effect
+            state: set-color-range-exact
+        card:
+          type: entities
+          title: Color Range (Index)
+          show_header_toggle: false
+          entities:
+            - input_number.led_start_index
+            - input_number.led_end_index
+      - type: conditional
+        conditions:
+          - condition: state
+            entity: input_select.led_effect
+            state: set-color-range-percent
+        card:
+          type: entities
+          title: Color Range (%)
+          show_header_toggle: false
+          entities:
+            - input_number.led_start_percent
+            - input_number.led_end_percent
+      - type: conditional
+        conditions:
+          - condition: state
+            entity: input_select.led_effect
+            state: running
+        card:
+          type: entities
+          show_header_toggle: false
+          entities:
+            - entity: input_number.led_wait_ms
+            - entity: input_number.led_duration_ms
+            - entity: input_number.led_width
+      - type: conditional
+        conditions:
+          - condition: state
+            entity: input_select.led_effect
+            state: color-fade
+        card:
+          type: entities
+          show_header_toggle: false
+          entities:
+            - entity: input_number.led_wait_ms
+            - entity: input_number.led_steps
+    column_span: 1
+  - type: grid
+    cards:
+      - type: conditional
+        conditions:
+          - condition: state
+            entity: input_select.led_effect
+            state: set-brightness
+        card:
+          type: entities
+          title: Set Brightness
+          show_header_toggle: false
+          entities:
+            - input_number.led_brightness
+      - type: conditional
+        conditions:
+          - condition: or
             conditions:
               - condition: state
                 entity: input_select.led_effect
@@ -32,35 +144,32 @@ cards:
                 state: set-color
         card:
           type: entities
-          # title: Optional Color Mode # Optional title
           show_header_toggle: false
           entities:
-            - type: conditional # Only show if sparkle is selected
+            - type: conditional
               conditions:
                 - condition: state
                   entity: input_select.led_effect
                   state: sparkle
               row:
                 entity: input_boolean.led_sparkle_use_multicolor
-            - type: conditional # Only show if theater_chase is selected
+            - type: conditional
               conditions:
                 - condition: state
                   entity: input_select.led_effect
                   state: theater-chase
               row:
                 entity: input_boolean.led_theater_chase_use_rainbow
-            - type: conditional # Only show if set_color is selected
+            - type: conditional
               conditions:
                 - condition: state
                   entity: input_select.led_effect
                   state: set-color
               row:
                 entity: input_boolean.led_set_color_use_white
-
-      # --- Main Color Picker (Conditional) --- Using light-entity-card
+          state_color: false
       - type: conditional
         conditions:
-          # ALL of these top-level conditions must be true (default AND)
           - condition: state
             entity: input_select.led_effect
             state_not: bitcoin
@@ -79,235 +188,127 @@ cards:
           - condition: state
             entity: input_select.led_effect
             state_not: set-brightness
-          # AND one of the following OR groups must be true (Handles optional toggles)
           - condition: or
             conditions:
               - condition: state
                 entity: input_select.led_effect
                 state_not: sparkle
-              - condition: state # If sparkle IS selected, multicolor toggle must be OFF
+              - condition: state
                 entity: input_boolean.led_sparkle_use_multicolor
-                state: 'off'
+                state: "off"
           - condition: or
             conditions:
               - condition: state
                 entity: input_select.led_effect
                 state_not: theater-chase
-              - condition: state # If theater_chase IS selected, rainbow toggle must be OFF
+              - condition: state
                 entity: input_boolean.led_theater_chase_use_rainbow
-                state: 'off'
+                state: "off"
           - condition: or
             conditions:
               - condition: state
                 entity: input_select.led_effect
                 state_not: set-color
-              - condition: state # If set_color IS selected, white toggle must be OFF
+              - condition: state
                 entity: input_boolean.led_set_color_use_white
-                state: 'off'
+                state: "off"
         card:
+          shorten_cards: false
+          consolidate_entities: false
+          child_card: true
+          hide_header: true
+          show_header_icon: false
+          header: Select Color
+          color_wheel: true
+          persist_features: false
+          brightness: false
+          color_temp: false
+          white_value: false
+          color_picker: true
+          speed: false
+          intensity: false
+          force_features: false
+          show_slider_percent: false
+          full_width_sliders: false
+          brightness_icon: weather-sunny
+          white_icon: file-word-box
+          temperature_icon: thermometer
+          speed_icon: speedometer
+          intensity_icon: transit-connection-horizontal
           type: custom:light-entity-card
           entity: light.led_truss_color_picker
-          # Use header outside the main entity display
-          header: Select Color
-          # --- Key changes based on documentation ---
-          hide_header: true        # Hides the default header AND the toggle switch
-          brightness: false        # Explicitly disable brightness slider
-          color_temp: false        # Explicitly disable color temp slider
-          white_value: false       # Explicitly disable white value slider
-          color_picker: true       # Ensure color picker is enabled (default, but good to be explicit)
-          show_effect: false       # Hide effects list
-          # --- Layout options (keep or adjust as needed) ---
-          full_width_controls: true # Makes controls like the picker potentially wider
-          persist_features: true # Try setting to false or removing, might help ensure controls are hidden
-
-      # --- Effect Specific Parameters (Each in its own conditional card) ---
-
+          show_effect: false
+          full_width_controls: true
+          effects_list: false
       - type: conditional
         conditions:
-          - condition: state # Added explicit condition state
+          - condition: state
             entity: input_select.led_effect
             state: bitcoin
         card:
           type: entities
-          title: Bitcoin Options
+          title: Bitcoin Monitor
           show_header_toggle: false
           entities:
             - input_number.led_duration
             - input_number.led_time_threshold_in_secs
-
       - type: conditional
         conditions:
-          - condition: state # Added explicit condition state
+          - condition: state
             entity: input_select.led_effect
             state: color-fade
         card:
           type: entities
-          title: Color Fade Options
+          title: Color Fade
           show_header_toggle: false
           entities:
-            - input_number.led_color_from_r
-            - input_number.led_color_from_g
-            - input_number.led_color_from_b
-            - input_number.led_color_to_r
-            - input_number.led_color_to_g
-            - input_number.led_color_to_b
-            - input_number.led_steps
-            - input_number.led_wait_ms
-
+            - entity: input_number.led_color_from_r
+            - entity: input_number.led_color_from_g
+            - entity: input_number.led_color_from_b
+            - entity: input_number.led_color_to_r
+            - entity: input_number.led_color_to_g
+            - entity: input_number.led_color_to_b
       - type: conditional
         conditions:
-          - condition: state # Added explicit condition state
-            entity: input_select.led_effect
-            state: glow
-        card:
-          type: entities
-          title: Glow Options
-          show_header_toggle: false
-          entities:
-            - input_number.led_frames
-            - input_number.led_wait_ms
-
-      - type: conditional
-        conditions:
-          - condition: state # Added explicit condition state
-            entity: input_select.led_effect
-            state: wave
-        card:
-          type: entities
-          title: Wave Options
-          show_header_toggle: false
-          entities:
-            - input_number.led_frames
-            - input_number.led_cycles
-            - input_number.led_speed
-            - input_number.led_wait_ms
-
-      - type: conditional
-        conditions:
-          - condition: state # Added explicit condition state
-            entity: input_select.led_effect
-            state: color-wipe
-        card:
-          type: entities
-          title: Color Wipe Options
-          show_header_toggle: false
-          entities:
-            - input_number.led_wait_ms
-
-      - type: conditional
-        conditions:
-          - condition: state # Added explicit condition state
-            entity: input_select.led_effect
-            state: sparkle
-        card:
-          type: entities
-          title: Sparkle Options
-          show_header_toggle: false
-          entities:
-            # Color toggle/sliders handled above
-            - input_number.led_wait_ms
-            - input_boolean.led_cummulative
-
-      - type: conditional
-        conditions:
-          - condition: state # Added explicit condition state
-            entity: input_select.led_effect
-            state: rainbow
-        card:
-          type: entities
-          title: Rainbow Options
-          show_header_toggle: false
-          entities:
-            - input_number.led_wait_ms
-            - input_number.led_iterations
-
-      - type: conditional
-        conditions:
-          - condition: state # Added explicit condition state
+          - condition: state
             entity: input_select.led_effect
             state: rainbow-cycle
         card:
           type: entities
-          title: Rainbow Cycle Options
+          title: Rainbow Cycle
           show_header_toggle: false
           entities:
             - input_number.led_wait_ms
             - input_number.led_iterations
-
       - type: conditional
         conditions:
-          - condition: state # Added explicit condition state
+          - condition: state
             entity: input_select.led_effect
-            state: theater-chase
+            state: rainbow
         card:
           type: entities
-          title: Theater Chase Options
+          title: Rainbow
           show_header_toggle: false
           entities:
-            # Color toggle/sliders handled above
             - input_number.led_wait_ms
             - input_number.led_iterations
-
-      - type: conditional
-        conditions:
-          - condition: state # Added explicit condition state
-            entity: input_select.led_effect
-            state: running
-        card:
-          type: entities
-          title: Running Options
-          show_header_toggle: false
-          entities:
-            - input_number.led_wait_ms
-            - input_number.led_duration_ms
-            - input_number.led_width
-
-      - type: conditional
-        conditions:
-          - condition: state # Added explicit condition state
-            entity: input_select.led_effect
-            state: set-brightness
-        card:
-          type: entities
-          title: Brightness Control
-          show_header_toggle: false
-          entities:
-            - input_number.led_brightness
-
-      - type: conditional
-        conditions:
-          - condition: state # Added explicit condition state
-            entity: input_select.led_effect
-            state: set-color-range-percent
-        card:
-          type: entities
-          title: Set Color Range (%)
-          show_header_toggle: false
-          entities:
-            # Color sliders handled above
-            - input_number.led_start_percent
-            - input_number.led_end_percent
-
-      - type: conditional
-        conditions:
-          - condition: state # Added explicit condition state
-            entity: input_select.led_effect
-            state: set-color-range-exact
-        card:
-          type: entities
-          title: Set Color Range (Index)
-          show_header_toggle: false
-          entities:
-            # Color sliders handled above
-            - input_number.led_start_index
-            - input_number.led_end_index
-
-      # --- Action Button --- (Bottom Card)
-      - type: button
+  - type: grid
+    cards:
+      - show_name: true
+        show_icon: true
+        type: button
         tap_action:
           action: call-service
           service: script.run_led_effect
         name: Run Effect
         icon: mdi:send
-
-# --- End of view configuration --- 
+        grid_options:
+          columns: full
+          rows: 5
+header:
+  layout: start
+  badges_position: top
+max_columns: 4
+title: LED
+icon: mdi:led-strip-variant
+cards: []
