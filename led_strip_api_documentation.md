@@ -16,6 +16,7 @@ To activate the LED control system:
 
 3. **Start the API**
    ```bash
+   cd led_truss/
    sudo /home/pi/led_truss/venv/bin/python -m uvicorn app.main:app --host 0.0.0.0 --port 8000
    ```
 
