@@ -5,7 +5,7 @@ import requests
 from rpi_ws281x import *
 
 class truss:
-    def __init__(self, strip1_count=900, strip2_count=900, strip1_pin=18, strip2_pin=13, freq=800000, dma=10, brightness=125):
+    def __init__(self, strip1_count=896, strip2_count=894, strip1_pin=18, strip2_pin=13, freq=800000, dma=10, brightness=125):
         # 
         self.STRIP1_COUNT = strip1_count  # Number of LEDs in strip 1
         self.STRIP2_COUNT = strip2_count  # Number of LEDs in strip 2
@@ -41,10 +41,10 @@ class truss:
     # Auxiliary Functions
     def set_pixel_color(self, pixel_index, color):
         if pixel_index < self.STRIP1_COUNT:
-            pixel_index_new = int(self.STRIP1_COUNT - 1 - pixel_index)
-            self.strip1.setPixelColor(pixel_index_new, color)
+            self.strip1.setPixelColor(pixel_index, color)
+
         else: 
-            pixel_index_new = int(pixel_index - self.STRIP1_COUNT)
+            pixel_index_new = int(self.STRIP2_COUNT - (pixel_index - self.STRIP1_COUNT)) -1
             self.strip2.setPixelColor(pixel_index_new, color)
                 
     def show(self):

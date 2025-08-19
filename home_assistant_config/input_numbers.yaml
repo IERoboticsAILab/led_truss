@@ -81,8 +81,8 @@ led_frames:
 led_wait_ms:
   name: Wait (ms)
   min: 0
-  max: 1000
-  step: 10
+  max: 200
+  step: 5
   mode: slider
   initial: 50
   icon: mdi:timer-sand
