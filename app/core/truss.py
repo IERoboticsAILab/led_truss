@@ -270,16 +270,13 @@ class truss:
             
             previous_price = current_price
 
-    def heart_rate(self, url, duration = 300, poll_interval_ms = 5000, min_hr = 40, yellow_start = 75, red_start = 120, max_hr = 200):
-        """Fetch heart rate from a URL and visualize status from green to red.
+    def heart_rate(self, url, duration = 300, poll_interval_ms = 1000, min_hr = 40, yellow_start = 75, red_start = 120, max_hr = 200):
+        """Read heart rate from an app.heart.io-like widget and map value to color.
 
-        The strip is filled with a solid color mapped from heart rate:
-        - Green within [min_hr, yellow_start)
-        - Gradient from green→yellow within [min_hr, yellow_start)
-        - Gradient from yellow→red within [yellow_start, red_start)
-        - Red at or above red_start
-        Values are clamped within [min_hr, max_hr].
+        Simple implementation: open the page, read `.heartrate` every tick, set color.
         """
+
+        from playwright.sync_api import sync_playwright
 
         def clamp(value, low, high):
             return max(low, min(high, value))
@@ -290,66 +287,27 @@ class truss:
         def color_from_hr(hr_value):
             hr = clamp(hr_value, min_hr, max_hr)
             if hr <= yellow_start:
-                # green (0,255,0) to yellow (255,255,0)
-                if yellow_start == min_hr:
-                    t = 1.0
-                else:
-                    t = (hr - min_hr) / float(yellow_start - min_hr)
-                r = lerp(0, 255, t)
-                g = 255
-                b = 0
-                return Color(r, g, b)
-            elif hr < red_start:
-                # yellow (255,255,0) to red (255,0,0)
-                if red_start == yellow_start:
-                    t = 1.0
-                else:
-                    t = (hr - yellow_start) / float(red_start - yellow_start)
-                r = 255
-                g = lerp(255, 0, t)
-                b = 0
-                return Color(r, g, b)
-            else:
-                return Color(255, 0, 0)
+                t = 1.0 if yellow_start == min_hr else (hr - min_hr) / float(yellow_start - min_hr)
+                return Color(lerp(0, 255, t), 255, 0)
+            if hr < red_start:
+                t = 1.0 if red_start == yellow_start else (hr - yellow_start) / float(red_start - yellow_start)
+                return Color(255, lerp(255, 0, t), 0)
+            return Color(255, 0, 0)
 
-        end_time = time.time() + duration
-        while time.time() < end_time:
-            try:
-                resp = requests.get(url, timeout=5)
-                resp.raise_for_status()
-                hr_val = None
-                # Try JSON first
-                try:
-                    data = resp.json()
-                    # common keys
-                    for key in ("hr", "heart_rate", "heartRate", "bpm", "value"):
-                        if isinstance(data, dict) and key in data:
-                            hr_val = float(data[key])
-                            break
-                    if hr_val is None and isinstance(data, (int, float)):
-                        hr_val = float(data)
-                except ValueError:
-                    # Fallback to plain text
-                    txt = resp.text.strip()
-                    # Extract first float-like number
-                    num = ''
-                    for ch in txt:
-                        if ch.isdigit() or ch in ['.', ',']:
-                            num += ('.' if ch == ',' else ch)
-                        elif num:
-                            break
-                    if num:
-                        hr_val = float(num)
+        with sync_playwright() as p:
+            browser = p.chromium.launch(headless=True)
+            page = browser.new_page()
+            page.goto(url, wait_until="domcontentloaded")
+            page.wait_for_selector(".heartrate", timeout=20000)
 
-                if hr_val is None:
-                    # Could not parse; show blue as error
-                    self.set_color_all(Color(0, 0, 255))
-                else:
-                    c = color_from_hr(hr_val)
-                    self.set_color_all(c)
-            except Exception:
-                # network or parse error -> magenta
-                self.set_color_all(Color(255, 0, 255))
+            end_time = time.time() + duration
+            while time.time() < end_time:
+                text = page.inner_text(".heartrate")
+                digits = ''.join(ch for ch in text if ch.isdigit())
+                if digits:
+                    hr_val = int(digits)
+                    self.set_color_all(color_from_hr(hr_val))
+                time.sleep(poll_interval_ms / 1000.0)
 
-            time.sleep(poll_interval_ms / 1000.0)
+            browser.close()
         

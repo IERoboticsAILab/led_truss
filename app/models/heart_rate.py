@@ -1,8 +1,8 @@
-from pydantic import BaseModel, Field, HttpUrl
+from pydantic import BaseModel, Field
 
 
 class HeartRateRequest(BaseModel):
-    url: HttpUrl = Field(..., description="Endpoint returning the current heart rate (JSON or plain number)")
+    url: str = Field(..., description="Endpoint returning the current heart rate (JSON or plain number)")
     duration: int = Field(default=300, ge=1, description="Total duration to monitor in seconds")
     poll_interval_ms: int = Field(default=5000, ge=100, description="How often to poll the URL in milliseconds")
     min_hr: int = Field(default=40, ge=0, description="Lower bound for green start")

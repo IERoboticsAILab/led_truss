@@ -16,6 +16,6 @@ led_effect:
     - set-brightness
     - set-color-range-percent
     - set-color-range-exact
-h    - heart-rate
+    - heart-rate
   initial: glow
   icon: mdi:string-lights 
