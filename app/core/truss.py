@@ -270,7 +270,7 @@ class truss:
             
             previous_price = current_price
 
-    def heart_rate(self, url, duration = 300, poll_interval_ms = 1000, min_hr = 40, yellow_start = 75, red_start = 120, max_hr = 200):
+    def heart_rate(self, url, duration = 300, poll_interval = 1, min_hr = 40, yellow_start = 75, red_start = 120, max_hr = 200):
         """Read heart rate from an app.heart.io-like widget and map value to color.
 
         Simple implementation: open the page, read `.heartrate` every tick, set color.
@@ -307,7 +307,7 @@ class truss:
                 if digits:
                     hr_val = int(digits)
                     self.set_color_all(color_from_hr(hr_val))
-                time.sleep(poll_interval_ms / 1000.0)
+                time.sleep(poll_interval)   
 
             browser.close()
         

@@ -198,13 +198,13 @@ led_hr_duration:
   mode: slider
   initial: 300
   icon: mdi:timer-outline
-led_hr_poll_interval_ms:
-  name: HR Poll (ms)
-  min: 100
-  max: 60000
-  step: 100
+led_hr_poll_interval_s:
+  name: HR Poll (s)
+  min: 1
+  max: 60
+  step: 1
   mode: slider
-  initial: 5000
+  initial: 1
   icon: mdi:timer-sand
 led_hr_min:
   name: HR Min

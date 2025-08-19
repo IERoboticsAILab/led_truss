@@ -56,7 +56,7 @@ sections:
           entities:
             - input_text.led_hr_url
             - input_number.led_hr_duration
-            - input_number.led_hr_poll_interval_ms
+            - input_number.led_hr_poll_interval_s
             - input_number.led_hr_min
             - input_number.led_hr_yellow_start
             - input_number.led_hr_red_start
@@ -205,6 +205,9 @@ sections:
           - condition: state
             entity: input_select.led_effect
             state_not: set-brightness
+          - condition: state
+            entity: input_select.led_effect
+            state_not: heart-rate
           - condition: or
             conditions:
               - condition: state

@@ -200,17 +200,17 @@
       "url": {
         "type": "string",
         "description": "HTTP(S) endpoint returning the current heart rate (JSON or plain number)",
-        "default": "http://localhost:8000/example/hr"
+        "default": "https://app.hyperate.io/74524/"
       },
       "duration": {
         "type": "int",
         "description": "Total duration to monitor in seconds",
         "default": 300
       },
-      "poll_interval_ms": {
-        "type": "int",
-        "description": "Polling interval in milliseconds",
-        "default": 5000
+      "poll_interval": {
+        "type": "float",
+        "description": "Polling interval in seconds",
+        "default": 1.0
       },
       "min_hr": {
         "type": "int",
