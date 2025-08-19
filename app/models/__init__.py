@@ -14,3 +14,4 @@ from .color_control import (
     SetColorRangePercentRequest,
     SetColorRangeExactRequest
 ) 
+from .heart_rate import HeartRateRequest

@@ -4,7 +4,7 @@ from rpi_ws281x import Color
 from app.models import (
     BitcoinRequest, GlowRequest, WaveRequest, ColorWipeRequest,
     ColorFadeRequest, SparkleRequest, RainbowRequest, RainbowCycleRequest,
-    TheaterChaseRequest, RunningRequest
+    TheaterChaseRequest, RunningRequest, HeartRateRequest
 )
 from app.core.dependencies import get_truss_controller
 from app.core.truss import truss # Type hint for dependency
@@ -87,3 +87,17 @@ def running_effect(request: RunningRequest, truss_controller: truss = Depends(ge
     """Triggers the running lights effect."""
     truss_controller.running(request.wait_ms, request.duration_ms, request.width)
     return {"status": "success"} 
+
+@router.post("/heart-rate")
+def heart_rate_effect(request: HeartRateRequest, truss_controller: truss = Depends(get_truss_controller)):
+    """Monitors a heart rate URL and displays color-coded status."""
+    truss_controller.heart_rate(
+        url=str(request.url),
+        duration=request.duration,
+        poll_interval_ms=request.poll_interval_ms,
+        min_hr=request.min_hr,
+        yellow_start=request.yellow_start,
+        red_start=request.red_start,
+        max_hr=request.max_hr,
+    )
+    return {"status": "success"}

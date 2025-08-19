@@ -269,4 +269,87 @@ class truss:
                     self.glow(Color(255, 255, 255))  # White for no change
             
             previous_price = current_price
+
+    def heart_rate(self, url, duration = 300, poll_interval_ms = 5000, min_hr = 40, yellow_start = 75, red_start = 120, max_hr = 200):
+        """Fetch heart rate from a URL and visualize status from green to red.
+
+        The strip is filled with a solid color mapped from heart rate:
+        - Green within [min_hr, yellow_start)
+        - Gradient from green→yellow within [min_hr, yellow_start)
+        - Gradient from yellow→red within [yellow_start, red_start)
+        - Red at or above red_start
+        Values are clamped within [min_hr, max_hr].
+        """
+
+        def clamp(value, low, high):
+            return max(low, min(high, value))
+
+        def lerp(a, b, t):
+            return int(a + (b - a) * t)
+
+        def color_from_hr(hr_value):
+            hr = clamp(hr_value, min_hr, max_hr)
+            if hr <= yellow_start:
+                # green (0,255,0) to yellow (255,255,0)
+                if yellow_start == min_hr:
+                    t = 1.0
+                else:
+                    t = (hr - min_hr) / float(yellow_start - min_hr)
+                r = lerp(0, 255, t)
+                g = 255
+                b = 0
+                return Color(r, g, b)
+            elif hr < red_start:
+                # yellow (255,255,0) to red (255,0,0)
+                if red_start == yellow_start:
+                    t = 1.0
+                else:
+                    t = (hr - yellow_start) / float(red_start - yellow_start)
+                r = 255
+                g = lerp(255, 0, t)
+                b = 0
+                return Color(r, g, b)
+            else:
+                return Color(255, 0, 0)
+
+        end_time = time.time() + duration
+        while time.time() < end_time:
+            try:
+                resp = requests.get(url, timeout=5)
+                resp.raise_for_status()
+                hr_val = None
+                # Try JSON first
+                try:
+                    data = resp.json()
+                    # common keys
+                    for key in ("hr", "heart_rate", "heartRate", "bpm", "value"):
+                        if isinstance(data, dict) and key in data:
+                            hr_val = float(data[key])
+                            break
+                    if hr_val is None and isinstance(data, (int, float)):
+                        hr_val = float(data)
+                except ValueError:
+                    # Fallback to plain text
+                    txt = resp.text.strip()
+                    # Extract first float-like number
+                    num = ''
+                    for ch in txt:
+                        if ch.isdigit() or ch in ['.', ',']:
+                            num += ('.' if ch == ',' else ch)
+                        elif num:
+                            break
+                    if num:
+                        hr_val = float(num)
+
+                if hr_val is None:
+                    # Could not parse; show blue as error
+                    self.set_color_all(Color(0, 0, 255))
+                else:
+                    c = color_from_hr(hr_val)
+                    self.set_color_all(c)
+            except Exception:
+                # network or parse error -> magenta
+                self.set_color_all(Color(255, 0, 255))
+
+            time.sleep(poll_interval_ms / 1000.0)
         

@@ -194,6 +194,46 @@
       }
     }
   },
+  "heart-rate": {
+    "description": "Monitor heart rate from a URL and show green→yellow→red based on thresholds",
+    "params": {
+      "url": {
+        "type": "string",
+        "description": "HTTP(S) endpoint returning the current heart rate (JSON or plain number)",
+        "default": "http://localhost:8000/example/hr"
+      },
+      "duration": {
+        "type": "int",
+        "description": "Total duration to monitor in seconds",
+        "default": 300
+      },
+      "poll_interval_ms": {
+        "type": "int",
+        "description": "Polling interval in milliseconds",
+        "default": 5000
+      },
+      "min_hr": {
+        "type": "int",
+        "description": "Lower bound for green start",
+        "default": 40
+      },
+      "yellow_start": {
+        "type": "int",
+        "description": "Threshold where green transitions to yellow",
+        "default": 75
+      },
+      "red_start": {
+        "type": "int",
+        "description": "Threshold where yellow transitions to red",
+        "default": 120
+      },
+      "max_hr": {
+        "type": "int",
+        "description": "Upper bound for clamping and full red",
+        "default": 200
+      }
+    }
+  },
   "clear": {
     "description": "Clears all LEDs (turns them off)",
     "params": {}

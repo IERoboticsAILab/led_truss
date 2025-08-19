@@ -190,3 +190,51 @@ led_time_threshold_in_secs: # For bitcoin effect
   mode: slider
   initial: 30
   icon: mdi:timelapse 
+led_hr_duration:
+  name: HR Duration (s)
+  min: 10
+  max: 3600
+  step: 10
+  mode: slider
+  initial: 300
+  icon: mdi:timer-outline
+led_hr_poll_interval_ms:
+  name: HR Poll (ms)
+  min: 100
+  max: 60000
+  step: 100
+  mode: slider
+  initial: 5000
+  icon: mdi:timer-sand
+led_hr_min:
+  name: HR Min
+  min: 0
+  max: 200
+  step: 1
+  mode: slider
+  initial: 40
+  icon: mdi:heart
+led_hr_yellow_start:
+  name: HR Yellow Start
+  min: 0
+  max: 200
+  step: 1
+  mode: slider
+  initial: 75
+  icon: mdi:heart-pulse
+led_hr_red_start:
+  name: HR Red Start
+  min: 0
+  max: 220
+  step: 1
+  mode: slider
+  initial: 120
+  icon: mdi:heart-flash
+led_hr_max:
+  name: HR Max
+  min: 60
+  max: 240
+  step: 1
+  mode: slider
+  initial: 200
+  icon: mdi:heart-multiple
