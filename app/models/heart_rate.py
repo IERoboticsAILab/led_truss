@@ -1,5 +1,4 @@
 from pydantic import BaseModel, Field
-from typing import Literal
 
 
 class HeartRateRequest(BaseModel):
@@ -10,5 +9,4 @@ class HeartRateRequest(BaseModel):
     yellow_start: int = Field(default=75, ge=0, description="Threshold where green transitions to yellow")
     red_start: int = Field(default=120, ge=0, description="Threshold where yellow transitions to red")
     max_hr: int = Field(default=200, ge=1, description="Upper bound for clamping and full red")
-    pattern: Literal["solid", "thermo", "trail"] = Field(default="trail", description="HR renderer pattern")
 

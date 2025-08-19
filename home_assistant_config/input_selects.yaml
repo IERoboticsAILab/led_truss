@@ -19,12 +19,3 @@ led_effect:
     - heart-rate
   initial: glow
   icon: mdi:string-lights 
-
-led_hr_pattern:
-  name: HR Pattern
-  options:
-    - solid
-    - thermo
-    - trail
-  initial: trail
-  icon: mdi:chart-timeline-variant

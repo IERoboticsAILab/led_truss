@@ -21,7 +21,6 @@ send_led_effect:
     {% set hr_red = states('input_number.led_hr_red_start') | int(120) %}
     {% set hr_max = states('input_number.led_hr_max') | int(200) %}
     {% set hr_url = states('input_text.led_hr_url') %}
-    {% set hr_pattern = states('input_select.led_hr_pattern') %}
     {# Initialize an empty list to hold JSON key-value strings #}
     {% set payload_items = [] %}
 
@@ -83,7 +82,6 @@ send_led_effect:
       {% set payload_items = payload_items + ['"yellow_start": ' + (hr_yellow | string)] %}
       {% set payload_items = payload_items + ['"red_start": ' + (hr_red | string)] %}
       {% set payload_items = payload_items + ['"max_hr": ' + (hr_max | string)] %}
-      {% set payload_items = payload_items + ['"pattern": "' ~ hr_pattern ~ '"'] %}
     {% elif effect == 'clear' %}
       {# No payload items needed, results in {} #}
     {% elif effect == 'set-color' %}
