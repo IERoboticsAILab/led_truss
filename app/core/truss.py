@@ -61,6 +61,14 @@ class truss:
             self.set_pixel_color(i, color)
         self.show()
 
+    def set_colors(self, colors):
+        """Set the entire strip from a list of Color(...) values and show once."""
+        count = min(len(colors), self.LED_COUNT)
+        for i in range(count):
+            self.set_pixel_color(i, colors[i])
+        # If provided list is shorter, leave remaining pixels as-is
+        self.show()
+
     def set_brightness(self, brightness):
         self.strip1.setBrightness(brightness)
         self.strip2.setBrightness(brightness)
@@ -270,30 +278,115 @@ class truss:
             
             previous_price = current_price
 
-    def heart_rate(self, url, duration = 300, poll_interval = 1, min_hr = 40, yellow_start = 75, red_start = 120, max_hr = 200):
-        """Read heart rate from an app.heart.io-like widget and map value to color.
+    def heart_rate(self, url, duration = 300, poll_interval = 1, min_hr = 40, yellow_start = 75, red_start = 120, max_hr = 200, pattern = "trail"):
+        """Render heart rate with fixed brightness using hue and motion only.
 
-        Simple implementation: open the page, read `.heartrate` every tick, set color.
+        - Brightness is constant across all HR values (fixed V in HSV).
+        - HR maps to hue from green→yellow→red.
+        - Motion encodes intensity (speed) and/or fill length; no brightness modulation.
+        - EMA smoothing is applied to stabilize the HR value.
         """
 
         from playwright.sync_api import sync_playwright
+        import threading
+        import colorsys
+        import math
 
-        def clamp(value, low, high):
-            return max(low, min(high, value))
+        # Fixed brightness (0..1). Does not change with HR.
+        FIXED_V = 0.8
 
-        def lerp(a, b, t):
-            return int(a + (b - a) * t)
+        def _norm(x, lo, hi):
+            return max(0.0, min(1.0, (x - lo) / float(hi - lo)))
 
-        def color_from_hr(hr_value):
-            hr = clamp(hr_value, min_hr, max_hr)
-            if hr <= yellow_start:
-                t = 1.0 if yellow_start == min_hr else (hr - min_hr) / float(yellow_start - min_hr)
-                return Color(lerp(0, 255, t), 255, 0)
-            if hr < red_start:
-                t = 1.0 if red_start == yellow_start else (hr - yellow_start) / float(red_start - yellow_start)
-                return Color(255, lerp(255, 0, t), 0)
-            return Color(255, 0, 0)
+        def hr_to_rgb_fixed(hr, lo=40, hi=200, sat=1.0, v=FIXED_V):
+            t = _norm(hr, lo, hi)              # 0..1 across HR range
+            h = (120.0 * (1.0 - t)) / 360.0    # 120°(green)→0°(red)
+            r, g, b = colorsys.hsv_to_rgb(h, sat, v)
+            return int(r * 255), int(g * 255), int(b * 255)
 
+        def bpm_phase(hr, t=None):
+            t = time.time() if t is None else t
+            return (t * (hr / 60.0)) % 1.0
+
+        # Patterns (no brightness modulation)
+        def pat_solid(strip_self, hr, lo=40, hi=200):
+            strip_self.set_color_all(Color(*hr_to_rgb_fixed(hr, lo, hi)))
+
+        def pat_thermometer(strip_self, hr, n_leds, lo=40, hi=200):
+            t = _norm(hr, lo, hi)
+            lit = max(1, int(t * n_leds))
+            out = []
+            for i in range(n_leds):
+                if i < lit:
+                    frac = (i + 1) / float(n_leds)
+                    c = hr_to_rgb_fixed(lo + frac * (hi - lo), lo, hi)  # hue gradient, fixed V
+                    out.append(Color(*c))
+                else:
+                    out.append(Color(0, 0, 0))  # background off
+            strip_self.set_colors(out)
+
+        def pat_pulse_trail(strip_self, hr, n_leds, lo=40, hi=200, trail=0.35):
+            base_r, base_g, base_b = hr_to_rgb_fixed(hr, lo, hi)
+            now = time.time()
+            pos = bpm_phase(hr, now) * (n_leds - 1)
+            out = []
+            for i in range(n_leds):
+                d = abs(i - pos)
+                gain = math.exp(-d * (6 * trail))  # spatial falloff only
+                r = int(base_r * gain)
+                g = int(base_g * gain)
+                b = int(base_b * gain)
+                out.append(Color(r, g, b))
+            strip_self.set_colors(out)
+
+        # Simple renderer state outside of an inner class
+        renderer_state = {
+            "lo": min_hr,
+            "hi": max_hr,
+            "ema_alpha": 0.35,
+            "fps": 40,
+            "pattern": pattern,
+            "running": False,
+            "hr_smooth": None,
+        }
+
+        def update_hr(hr_value):
+            lo = renderer_state["lo"]
+            hi = renderer_state["hi"]
+            hr_value = max(lo, min(hi, hr_value))
+            current = renderer_state["hr_smooth"]
+            if current is None:
+                renderer_state["hr_smooth"] = hr_value
+            else:
+                ema_alpha = renderer_state["ema_alpha"]
+                renderer_state["hr_smooth"] = current + ema_alpha * (hr_value - current)
+
+        def draw_frame():
+            lo = renderer_state["lo"]
+            hi = renderer_state["hi"]
+            hr = renderer_state["hr_smooth"] if renderer_state["hr_smooth"] is not None else (lo + hi) / 2.0
+            selected = renderer_state["pattern"]
+            if selected == "solid":
+                pat_solid(self, hr, lo, hi)
+            elif selected == "thermo":
+                pat_thermometer(self, hr, self.LED_COUNT, lo, hi)
+            else:
+                pat_pulse_trail(self, hr, self.LED_COUNT, lo, hi)
+
+        def start_renderer(duration=None):
+            renderer_state["running"] = True
+            t_end = time.time() + duration if duration else None
+            interval = 1.0 / float(renderer_state["fps"])    
+            while renderer_state["running"] and (t_end is None or time.time() < t_end):
+                draw_frame()
+                time.sleep(interval)
+            renderer_state["running"] = False
+
+        # Create renderer with desired pattern; default to pulse trail
+        render_thread = threading.Thread(target=start_renderer, kwargs={"duration": duration}, daemon=True)
+        render_thread.start()
+
+        # Poll HR and feed updates
         with sync_playwright() as p:
             browser = p.chromium.launch(headless=True, args=["--no-sandbox", "--disable-dev-shm-usage"])
             page = browser.new_page()
@@ -305,9 +398,15 @@ class truss:
                 text = page.inner_text(".heartrate")
                 digits = ''.join(ch for ch in text if ch.isdigit())
                 if digits:
-                    hr_val = int(digits)
-                    self.set_color_all(color_from_hr(hr_val))
-                time.sleep(poll_interval)   
+                    try:
+                        hr_val = int(digits)
+                        update_hr(hr_val)
+                    except ValueError:
+                        pass
+                time.sleep(poll_interval)
 
             browser.close()
+
+        # Stop renderer
+        renderer_state["running"] = False
         

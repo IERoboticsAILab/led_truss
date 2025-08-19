@@ -55,6 +55,7 @@ sections:
           show_header_toggle: false
           entities:
             - input_text.led_hr_url
+            - input_select.led_hr_pattern
             - input_number.led_hr_duration
             - input_number.led_hr_poll_interval_s
             - input_number.led_hr_min
