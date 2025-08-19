@@ -46,6 +46,18 @@ def create_app() -> FastAPI:
     app.include_router(control_router.router)
     print("Routers included.")
 
+    # --- Simple request logger for debugging 422 ---
+    @app.middleware("http")
+    async def log_heart_rate_payload(request, call_next):
+        if request.url.path == "/effects/heart-rate" and request.method == "POST":
+            try:
+                body = await request.body()
+                print("/effects/heart-rate payload:", body.decode("utf-8"))
+            except Exception as e:
+                print("Failed to read request body:", e)
+        response = await call_next(request)
+        return response
+
     # --- Root and General Endpoints ---
     @app.get("/", tags=["General"])
     def read_root():
