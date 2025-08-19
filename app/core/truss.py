@@ -295,7 +295,7 @@ class truss:
             return Color(255, 0, 0)
 
         with sync_playwright() as p:
-            browser = p.chromium.launch(headless=True)
+            browser = p.chromium.launch(headless=True, args=["--no-sandbox", "--disable-dev-shm-usage"])
             page = browser.new_page()
             page.goto(url, wait_until="domcontentloaded")
             page.wait_for_selector(".heartrate", timeout=20000)
