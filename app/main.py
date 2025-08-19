@@ -1,7 +1,9 @@
 import sys
 import json
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.exceptions import RequestValidationError
+from fastapi.responses import JSONResponse
 
 from app.routers import effects_router, control_router
 from app.effects.effect_loader import get_effects
@@ -57,6 +59,17 @@ def create_app() -> FastAPI:
                 print("Failed to read request body:", e)
         response = await call_next(request)
         return response
+
+    # --- Validation error logger ---
+    @app.exception_handler(RequestValidationError)
+    async def validation_exception_handler(request: Request, exc: RequestValidationError):
+        try:
+            body = await request.body()
+            body_text = body.decode("utf-8")
+        except Exception:
+            body_text = "<unavailable>"
+        print("Validation error on", request.url.path, "errors=", exc.errors(), "body=", body_text)
+        return JSONResponse(status_code=422, content={"detail": exc.errors()})
 
     # --- Root and General Endpoints ---
     @app.get("/", tags=["General"])
