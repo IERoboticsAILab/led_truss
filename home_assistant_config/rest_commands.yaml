@@ -75,7 +75,7 @@ send_led_effect:
       {% set payload_items = payload_items + ['"duration_ms": ' + (states('input_number.led_duration_ms') | int(18000) | string)] %}
       {% set payload_items = payload_items + ['"width": ' + (states('input_number.led_width') | int(1) | string)] %}
     {% elif effect == 'heart-rate' %}
-      {% set payload_items = payload_items + ['"url": ' + (hr_url | tojson)] %}
+      {% set payload_items = payload_items + ['"url": "' ~ hr_url ~ '"'] %}
       {% set payload_items = payload_items + ['"duration": ' + (hr_duration | string)] %}
       {% set payload_items = payload_items + ['"poll_interval": ' + (hr_poll | string)] %}
       {% set payload_items = payload_items + ['"min_hr": ' + (hr_min | string)] %}
