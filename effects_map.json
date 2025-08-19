@@ -209,7 +209,7 @@
       },
       "poll_interval": {
         "type": "float",
-        "description": "Polling interval in seconds",
+        "description": "Polling frequency in hertz (times per second)",
         "default": 1.0
       },
       "min_hr": {

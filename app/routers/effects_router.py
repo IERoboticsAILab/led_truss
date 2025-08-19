@@ -94,7 +94,7 @@ def heart_rate_effect(request: HeartRateRequest, truss_controller: truss = Depen
     truss_controller.heart_rate(
         url=str(request.url),
         duration=request.duration,
-        poll_interval=request.poll_interval,
+        poll_hz=request.poll_interval,
         min_hr=request.min_hr,
         yellow_start=request.yellow_start,
         red_start=request.red_start,

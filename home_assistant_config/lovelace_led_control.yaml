@@ -56,7 +56,7 @@ sections:
           entities:
             - input_text.led_hr_url
             - input_number.led_hr_duration
-            - input_number.led_hr_poll_interval_s
+            - input_number.led_hr_poll
             - input_number.led_hr_min
             - input_number.led_hr_yellow_start
             - input_number.led_hr_red_start

@@ -15,7 +15,7 @@ send_led_effect:
     {% set iterations = states('input_number.led_iterations') | int(1) %}
     {% set frames = states('input_number.led_frames') | int(300) %}
     {% set hr_duration = states('input_number.led_hr_duration') | int(300) %}
-    {% set hr_poll = states('input_number.led_hr_poll_interval_s') | int(1) %}
+    {% set hr_poll_hz = states('input_number.led_hr_poll') | float(1.0) %}
     {% set hr_min = states('input_number.led_hr_min') | int(40) %}
     {% set hr_yellow = states('input_number.led_hr_yellow_start') | int(75) %}
     {% set hr_red = states('input_number.led_hr_red_start') | int(120) %}
@@ -77,7 +77,7 @@ send_led_effect:
     {% elif effect == 'heart-rate' %}
       {% set payload_items = payload_items + ['"url": "' ~ hr_url ~ '"'] %}
       {% set payload_items = payload_items + ['"duration": ' + (hr_duration | string)] %}
-      {% set payload_items = payload_items + ['"poll_interval": ' + (hr_poll | string)] %}
+      {% set payload_items = payload_items + ['"poll_hz": ' + (hr_poll_hz | string)] %}
       {% set payload_items = payload_items + ['"min_hr": ' + (hr_min | string)] %}
       {% set payload_items = payload_items + ['"yellow_start": ' + (hr_yellow | string)] %}
       {% set payload_items = payload_items + ['"red_start": ' + (hr_red | string)] %}
