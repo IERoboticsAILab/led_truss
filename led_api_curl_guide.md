@@ -1,15 +1,9 @@
 # LED Strip Control API — Curl Commands & Parameters
 
 ## 🖥️ Setup
-- **SSH into the Raspberry Pi**
+- Start the API on the Raspberry Pi:
   ```bash
-  ssh pi@10.205.3.54
-  # password: raspberry
-  ```
-
-- **Run the API**
-  ```bash
-  cd led_truss/
+  cd ~/led_truss
   sudo /home/pi/led_truss/venv/bin/python -m uvicorn app.main:app --host 0.0.0.0 --port 8000
   ```
 
@@ -21,7 +15,7 @@
 Turns off all LEDs.
 
 ```bash
-curl -X POST http://10.205.3.54:8000/control/clear
+curl -X POST http://<pi-ip>:8000/control/clear
 ```
 
 ---
@@ -30,7 +24,7 @@ curl -X POST http://10.205.3.54:8000/control/clear
 Sets all LEDs to a color (defaults to white if not provided).
 
 ```bash
-curl -X POST http://10.205.3.54:8000/control/set-color -H "Content-Type: application/json" -d '{"color":{"r":255,"g":255,"b":255}}'
+curl -X POST http://<pi-ip>:8000/control/set-color -H "Content-Type: application/json" -d '{"color":{"r":255,"g":255,"b":255}}'
 ```
 
 - `r`, `g`, `b`: Integer values from 0 to 255
@@ -41,7 +35,7 @@ curl -X POST http://10.205.3.54:8000/control/set-color -H "Content-Type: applica
 Sets global brightness level.
 
 ```bash
-curl -X POST http://10.205.3.54:8000/control/set-brightness -H "Content-Type: application/json" -d '{"brightness":125}'
+curl -X POST http://<pi-ip>:8000/control/set-brightness -H "Content-Type: application/json" -d '{"brightness":125}'
 ```
 
 - `brightness`: 0 to 255
@@ -52,7 +46,7 @@ curl -X POST http://10.205.3.54:8000/control/set-brightness -H "Content-Type: ap
 Sets color between two percentage positions.
 
 ```bash
-curl -X POST http://10.205.3.54:8000/control/set-color-range-percent -H "Content-Type: application/json" -d '{"color":{"r":255,"g":0,"b":0},"start_percent":0.2,"end_percent":0.5}'
+curl -X POST http://<pi-ip>:8000/control/set-color-range-percent -H "Content-Type: application/json" -d '{"color":{"r":255,"g":0,"b":0},"start_percent":0.2,"end_percent":0.5}'
 ```
 
 - `start_percent`, `end_percent`: float values between 0.0 and 1.0
@@ -63,7 +57,7 @@ curl -X POST http://10.205.3.54:8000/control/set-color-range-percent -H "Content
 Sets color between two LED indices.
 
 ```bash
-curl -X POST http://10.205.3.54:8000/control/set-color-range-exact -H "Content-Type: application/json" -d '{"color":{"r":0,"g":0,"b":255},"start_index":10,"end_index":50}'
+curl -X POST http://<pi-ip>:8000/control/set-color-range-exact -H "Content-Type: application/json" -d '{"color":{"r":0,"g":0,"b":255},"start_index":10,"end_index":50}'
 ```
 
 - `start_index`, `end_index`: integer indices (e.g. 0 to 1800)
@@ -76,7 +70,7 @@ curl -X POST http://10.205.3.54:8000/control/set-color-range-exact -H "Content-T
 Tracks Bitcoin price with color updates.
 
 ```bash
-curl -X POST http://10.205.3.54:8000/effects/bitcoin -H "Content-Type: application/json" -d '{"duration":60,"time_threshold_in_secs":30}'
+curl -X POST http://<pi-ip>:8000/effects/bitcoin -H "Content-Type: application/json" -d '{"duration":60,"time_threshold_in_secs":30}'
 ```
 
 - `duration`: total seconds to monitor  
@@ -88,7 +82,7 @@ curl -X POST http://10.205.3.54:8000/effects/bitcoin -H "Content-Type: applicati
 Pulsing glow effect.
 
 ```bash
-curl -X POST http://10.205.3.54:8000/effects/glow -H "Content-Type: application/json" -d '{"color":{"r":0,"g":255,"b":0},"frames":300,"wait_ms":10}'
+curl -X POST http://<pi-ip>:8000/effects/glow -H "Content-Type: application/json" -d '{"color":{"r":0,"g":255,"b":0},"frames":300,"wait_ms":10}'
 ```
 
 - `frames`: number of frames  
@@ -100,7 +94,7 @@ curl -X POST http://10.205.3.54:8000/effects/glow -H "Content-Type: application/
 Cosine wave animation.
 
 ```bash
-curl -X POST http://10.205.3.54:8000/effects/wave -H "Content-Type: application/json" -d '{"color":{"r":255,"g":0,"b":0},"frames":300,"cycles":2,"speed":0.1,"wait_ms":10}'
+curl -X POST http://<pi-ip>:8000/effects/wave -H "Content-Type: application/json" -d '{"color":{"r":255,"g":0,"b":0},"frames":300,"cycles":2,"speed":0.1,"wait_ms":10}'
 ```
 
 - `cycles`: number of full waves  
@@ -113,7 +107,7 @@ curl -X POST http://10.205.3.54:8000/effects/wave -H "Content-Type: application/
 Wipes color across strip.
 
 ```bash
-curl -X POST http://10.205.3.54:8000/effects/color-wipe -H "Content-Type: application/json" -d '{"color":{"r":255,"g":255,"b":0},"wait_ms":50}'
+curl -X POST http://<pi-ip>:8000/effects/color-wipe -H "Content-Type: application/json" -d '{"color":{"r":255,"g":255,"b":0},"wait_ms":50}'
 ```
 
 - `wait_ms`: delay per LED pixel
@@ -124,7 +118,7 @@ curl -X POST http://10.205.3.54:8000/effects/color-wipe -H "Content-Type: applic
 Fades from one color to another.
 
 ```bash
-curl -X POST http://10.205.3.54:8000/effects/color-fade -H "Content-Type: application/json" -d '{"color_from":{"r":0,"g":0,"b":0},"color_to":{"r":255,"g":255,"b":255},"wait_ms":20,"steps":100}'
+curl -X POST http://<pi-ip>:8000/effects/color-fade -H "Content-Type: application/json" -d '{"color_from":{"r":0,"g":0,"b":0},"color_to":{"r":255,"g":255,"b":255},"wait_ms":20,"steps":100}'
 ```
 
 - `steps`: number of color steps  
@@ -136,7 +130,7 @@ curl -X POST http://10.205.3.54:8000/effects/color-fade -H "Content-Type: applic
 Random sparkle pixels.
 
 ```bash
-curl -X POST http://10.205.3.54:8000/effects/sparkle -H "Content-Type: application/json" -d '{"color":{"r":255,"g":255,"b":255},"wait_ms":50,"cummulative":false}'
+curl -X POST http://<pi-ip>:8000/effects/sparkle -H "Content-Type: application/json" -d '{"color":{"r":255,"g":255,"b":255},"wait_ms":50,"cummulative":false}'
 ```
 
 - `color`: optional, RGB  
@@ -148,7 +142,7 @@ curl -X POST http://10.205.3.54:8000/effects/sparkle -H "Content-Type: applicati
 Rainbow gradient fade.
 
 ```bash
-curl -X POST http://10.205.3.54:8000/effects/rainbow -H "Content-Type: application/json" -d '{"wait_ms":50,"iterations":1}'
+curl -X POST http://<pi-ip>:8000/effects/rainbow -H "Content-Type: application/json" -d '{"wait_ms":50,"iterations":1}'
 ```
 
 - `iterations`: how many cycles to run
@@ -159,7 +153,7 @@ curl -X POST http://10.205.3.54:8000/effects/rainbow -H "Content-Type: applicati
 Evenly distributed rainbow cycle.
 
 ```bash
-curl -X POST http://10.205.3.54:8000/effects/rainbow-cycle -H "Content-Type: application/json" -d '{"wait_ms":50,"iterations":5}'
+curl -X POST http://<pi-ip>:8000/effects/rainbow-cycle -H "Content-Type: application/json" -d '{"wait_ms":50,"iterations":5}'
 ```
 
 ---
@@ -168,7 +162,7 @@ curl -X POST http://10.205.3.54:8000/effects/rainbow-cycle -H "Content-Type: app
 Chase effect with optional color.
 
 ```bash
-curl -X POST http://10.205.3.54:8000/effects/theater-chase -H "Content-Type: application/json" -d '{"color":{"r":255,"g":0,"b":255},"wait_ms":50,"iterations":10}'
+curl -X POST http://<pi-ip>:8000/effects/theater-chase -H "Content-Type: application/json" -d '{"color":{"r":255,"g":0,"b":255},"wait_ms":50,"iterations":10}'
 ```
 
 ---
@@ -177,7 +171,17 @@ curl -X POST http://10.205.3.54:8000/effects/theater-chase -H "Content-Type: app
 Moving bar of light.
 
 ```bash
-curl -X POST http://10.205.3.54:8000/effects/running -H "Content-Type: application/json" -d '{"wait_ms":10,"duration_ms":18000,"width":1}'
+curl -X POST http://<pi-ip>:8000/effects/running -H "Content-Type: application/json" -d '{"wait_ms":10,"duration_ms":18000,"width":1}'
+```
+
+---
+
+## ❤️ Heart rate
+
+Requires Playwright Chromium on the host.
+
+```bash
+curl -X POST http://<pi-ip>:8000/effects/heart-rate -H "Content-Type: application/json" -d '{"url":"https://app.hyperate.io/74524/","duration":300,"poll_interval":1.0,"min_hr":40,"yellow_start":75,"red_start":120,"max_hr":200}'
 ```
 
 - `duration_ms`: total effect time  

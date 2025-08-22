@@ -1,5 +1,5 @@
 led_hr_url:
-  name: HR URL
+  name: HR URL(s)
   initial: https://app.hyperate.io/15875
   max: 512
   icon: mdi:webhook

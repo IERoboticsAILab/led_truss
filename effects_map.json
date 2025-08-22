@@ -199,7 +199,7 @@
     "params": {
       "url": {
         "type": "string",
-        "description": "HTTP(S) endpoint returning the current heart rate (JSON or plain number)",
+        "description": "One or more HTTP(S) URLs (comma-separated) each with a .heartrate element",
         "default": "https://app.hyperate.io/74524/"
       },
       "duration": {

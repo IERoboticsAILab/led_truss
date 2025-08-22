@@ -4,21 +4,21 @@
 
 To activate the LED control system:
 
-1. **Power On**
-   - Plug in all LED strip power supplies (ensure correct voltage).
-   - Power on the Raspberry Pi.
-
-2. **SSH Access**
+1. Power on all LED strip power supplies (ensure correct voltage) and the Raspberry Pi.
+2. Start the API (replace the path as needed):
    ```bash
-   ssh pi@10.205.3.54
-   # Password: raspberry
-   ```
-
-3. **Start the API**
-   ```bash
-   cd led_truss/
+   cd ~/led_truss
    sudo /home/pi/led_truss/venv/bin/python -m uvicorn app.main:app --host 0.0.0.0 --port 8000
    ```
+
+OpenAPI docs: `http://<pi-ip>:8000/docs`
+
+---
+
+## General Endpoints
+
+- `GET /` — health/welcome message
+- `GET /effects` — returns `effects_map.json` metadata (descriptions, params, defaults)
 
 ---
 
@@ -244,3 +244,28 @@ Moves a bright segment across the strip.
   "width": 1
 }
 ```
+
+---
+
+### `POST /heart-rate`
+
+Monitors a heart-rate widget URL and displays color-coded status (green → yellow → red) with a pulsing glow at the BPM frequency.
+
+Dependencies: Playwright Chromium must be installed on the host.
+
+**Request Body:**
+```json
+{
+  "url": "https://app.hyperate.io/74524/",
+  "duration": 300,
+  "poll_interval": 1.0,
+  "min_hr": 40,
+  "yellow_start": 75,
+  "red_start": 120,
+  "max_hr": 200
+}
+```
+
+Notes:
+- The page must contain an element with class `.heartrate` that contains the numeric BPM.
+- `poll_interval` is in hertz (times per second).

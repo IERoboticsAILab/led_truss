@@ -301,11 +301,19 @@ class truss:
             safe_hr = max(1, hr_value)
             return 60.0 / float(safe_hr)
 
+        # Support multiple URLs separated by commas; compute average heart rate
+        urls = [u.strip() for u in str(url).split(',') if u.strip()]
+        if not urls:
+            urls = [str(url)]
+
         with sync_playwright() as p:
             browser = p.chromium.launch(headless=True)
-            page = browser.new_page()
-            page.goto(url, wait_until="domcontentloaded")
-            page.wait_for_selector(".heartrate", timeout=20000)
+            pages = []
+            for u in urls:
+                pg = browser.new_page()
+                pg.goto(u, wait_until="domcontentloaded")
+                pg.wait_for_selector(".heartrate", timeout=20000)
+                pages.append(pg)
 
             end_time = time.time() + duration
             latest_hr = None
@@ -315,10 +323,18 @@ class truss:
                 now = time.time()
                 # Polling in Hz
                 if now >= next_poll_time:
-                    text = page.inner_text(".heartrate")
-                    digits = ''.join(ch for ch in text if ch.isdigit())
-                    if digits:
-                        latest_hr = int(digits)
+                    values = []
+                    for pg in pages:
+                        try:
+                            text = pg.inner_text(".heartrate")
+                            digits = ''.join(ch for ch in text if ch.isdigit())
+                            if digits:
+                                values.append(int(digits))
+                        except Exception:
+                            # Ignore read errors for individual pages in this cycle
+                            pass
+                    if values:
+                        latest_hr = int(round(sum(values) / float(len(values))))
                     next_poll_time = now + poll_period
 
                 # Determine color from latest HR (fallback to green if unknown)
