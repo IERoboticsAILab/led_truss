@@ -1,0 +1,201 @@
+led_color_r:
+  name: Color Red
+  min: 0
+  max: 255
+  step: 1
+  mode: slider
+  initial: 255
+  icon: mdi:format-color-fill
+led_color_g:
+  name: Color Green
+  min: 0
+  max: 255
+  step: 1
+  mode: slider
+  initial: 255
+  icon: mdi:format-color-fill
+led_color_b:
+  name: Color Blue
+  min: 0
+  max: 255
+  step: 1
+  mode: slider
+  initial: 255
+  icon: mdi:format-color-fill
+led_color_from_r:
+  name: From Red
+  min: 0
+  max: 255
+  step: 1
+  mode: slider
+  initial: 0
+  icon: mdi:format-color-fill
+led_color_from_g:
+  name: From Green
+  min: 0
+  max: 255
+  step: 1
+  mode: slider
+  initial: 0
+  icon: mdi:format-color-fill
+led_color_from_b:
+  name: From Blue
+  min: 0
+  max: 255
+  step: 1
+  mode: slider
+  initial: 0
+  icon: mdi:format-color-fill
+led_color_to_r:
+  name: To Red
+  min: 0
+  max: 255
+  step: 1
+  mode: slider
+  initial: 255
+  icon: mdi:format-color-fill
+led_color_to_g:
+  name: To Green
+  min: 0
+  max: 255
+  step: 1
+  mode: slider
+  initial: 255
+  icon: mdi:format-color-fill
+led_color_to_b:
+  name: To Blue
+  min: 0
+  max: 255
+  step: 1
+  mode: slider
+  initial: 255
+  icon: mdi:format-color-fill
+led_wait_ms:
+  name: Wait (ms)
+  min: 0
+  max: 200
+  step: 5
+  mode: slider
+  initial: 50
+  icon: mdi:timer-sand
+led_cycles:
+  name: Cycles
+  min: 1
+  max: 20
+  step: 1
+  mode: slider
+  initial: 1
+  icon: mdi:repeat
+led_speed:
+  name: Speed
+  min: 0.01
+  max: 1.0
+  step: 0.01
+  mode: slider
+  initial: 0.1
+  icon: mdi:run-fast
+led_steps:
+  name: Steps
+  min: 1
+  max: 500
+  step: 5
+  mode: slider
+  initial: 100
+  icon: mdi:stairs
+led_width:
+  name: Width (pixels)
+  min: 1
+  max: 50
+  step: 1
+  mode: slider
+  initial: 1
+  icon: mdi:arrow-expand-horizontal
+led_brightness:
+  name: Brightness
+  min: 0
+  max: 255
+  step: 5
+  mode: slider
+  initial: 125
+  icon: mdi:brightness-6
+led_start_percent:
+  name: Start (%)
+  min: 0.0
+  max: 1.0
+  step: 0.05
+  mode: slider
+  initial: 0.0
+  icon: mdi:page-first
+led_end_percent:
+  name: End (%)
+  min: 0.0
+  max: 1.0
+  step: 0.05
+  mode: slider
+  initial: 1.0
+  icon: mdi:page-last
+led_start_index:
+  name: Start Index
+  min: 0
+  max: 1799
+  step: 10
+  mode: slider
+  initial: 0
+  icon: mdi:page-first
+led_end_index:
+  name: End Index
+  min: 1
+  max: 1800
+  step: 10
+  mode: slider
+  initial: 1800
+  icon: mdi:page-last
+led_time_threshold_in_secs: # For bitcoin effect
+  name: Threshold (s)
+  min: 5
+  max: 60
+  step: 5
+  mode: slider
+  initial: 30
+  icon: mdi:timelapse 
+led_hr_poll:
+  name: HR Poll (Hz)
+  min: 0.5
+  max: 10
+  step: 0.5
+  mode: slider
+  initial: 1.0
+  icon: mdi:timer-sand
+led_hr_min:
+  name: HR Min
+  min: 0
+  max: 200
+  step: 1
+  mode: slider
+  initial: 40
+  icon: mdi:heart
+led_hr_yellow_start:
+  name: HR Yellow Start
+  min: 0
+  max: 200
+  step: 1
+  mode: slider
+  initial: 75
+  icon: mdi:heart-pulse
+led_hr_red_start:
+  name: HR Red Start
+  min: 0
+  max: 220
+  step: 1
+  mode: slider
+  initial: 120
+  icon: mdi:heart-flash
+led_hr_max:
+  name: HR Max
+  min: 60
+  max: 240
+  step: 1
+  mode: slider
+  initial: 200
+  icon: mdi:heart-multiple
+ 

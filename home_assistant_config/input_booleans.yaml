@@ -1,0 +1,25 @@
+led_cummulative:
+  name: Sparkle Accumulation
+  initial: off
+  icon: mdi:creation
+
+led_sparkle_use_multicolor:
+  name: Sparkle Use Multicolor
+  initial: off # 'off' means use the selected RGB color
+  icon: mdi:palette
+
+led_theater_chase_use_rainbow:
+  name: Theater Chase Use Rainbow
+  initial: off # 'off' means use the selected RGB color
+  icon: mdi:palette
+
+led_set_color_use_white:
+  name: Set Color Use White
+  initial: off # 'off' means use the selected RGB color
+  icon: mdi:palette 
+
+led_hr_pulse:
+  name: Heart Rate Pulse
+  initial: on
+  icon: mdi:heart-pulse
+  

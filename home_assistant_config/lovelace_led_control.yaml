@@ -1,0 +1,330 @@
+type: sections
+path: ""
+sections:
+  - type: grid
+    cards:
+      - type: entities
+        title: Select Effect
+        show_header_toggle: false
+        entities:
+          - input_select.led_effect
+      - type: conditional
+        conditions:
+          - condition: state
+            entity: input_select.led_effect
+            state: sparkle
+        card:
+          type: entities
+          show_header_toggle: false
+          entities:
+            - entity: input_boolean.led_cummulative
+            - entity: input_number.led_wait_ms
+      - type: conditional
+        conditions:
+          - condition: or
+            conditions:
+              - condition: state
+                entity: input_select.led_effect
+                state: color-wipe
+        card:
+          type: entities
+          show_header_toggle: false
+          entities:
+            - input_number.led_wait_ms
+      - type: conditional
+        conditions:
+          - condition: or
+            conditions:
+              - condition: state
+                entity: input_select.led_effect
+                state: theater-chase
+        card:
+          type: entities
+          show_header_toggle: false
+          entities:
+            - entity: input_number.led_wait_ms
+      - type: conditional
+        conditions:
+          - condition: state
+            entity: input_select.led_effect
+            state: heart-rate
+        card:
+          type: entities
+          title: Heart Rate Monitor
+          show_header_toggle: false
+          entities:
+            - input_text.led_hr_url
+            - input_number.led_hr_poll
+            - input_number.led_hr_min
+            - input_number.led_hr_yellow_start
+            - input_number.led_hr_red_start
+            - input_number.led_hr_max
+            - input_boolean.led_hr_pulse
+      - type: conditional
+        conditions:
+          - condition: state
+            entity: input_select.led_effect
+            state: glow
+        card:
+          type: entities
+          show_header_toggle: false
+          entities:
+            - entity: input_number.led_wait_ms
+      - type: conditional
+        conditions:
+          - condition: state
+            entity: input_select.led_effect
+            state: wave
+        card:
+          type: entities
+          show_header_toggle: false
+          entities:
+            - entity: input_number.led_wait_ms
+            - entity: input_number.led_cycles
+            - entity: input_number.led_speed
+      - type: conditional
+        conditions:
+          - condition: state
+            entity: input_select.led_effect
+            state: set-color-range-exact
+        card:
+          type: entities
+          title: Color Range (Index)
+          show_header_toggle: false
+          entities:
+            - input_number.led_start_index
+            - input_number.led_end_index
+      - type: conditional
+        conditions:
+          - condition: state
+            entity: input_select.led_effect
+            state: set-color-range-percent
+        card:
+          type: entities
+          title: Color Range (%)
+          show_header_toggle: false
+          entities:
+            - input_number.led_start_percent
+            - input_number.led_end_percent
+      - type: conditional
+        conditions:
+          - condition: state
+            entity: input_select.led_effect
+            state: running
+        card:
+          type: entities
+          show_header_toggle: false
+          entities:
+            - entity: input_number.led_wait_ms
+            - entity: input_number.led_width
+      - type: conditional
+        conditions:
+          - condition: state
+            entity: input_select.led_effect
+            state: color-fade
+        card:
+          type: entities
+          show_header_toggle: false
+          entities:
+            - entity: input_number.led_wait_ms
+            - entity: input_number.led_steps
+    column_span: 1
+  - type: grid
+    cards:
+      - type: conditional
+        conditions:
+          - condition: state
+            entity: input_select.led_effect
+            state: set-brightness
+        card:
+          type: entities
+          title: Set Brightness
+          show_header_toggle: false
+          entities:
+            - input_number.led_brightness
+      - type: conditional
+        conditions:
+          - condition: or
+            conditions:
+              - condition: state
+                entity: input_select.led_effect
+                state: sparkle
+              - condition: state
+                entity: input_select.led_effect
+                state: theater-chase
+              - condition: state
+                entity: input_select.led_effect
+                state: set-color
+        card:
+          type: entities
+          show_header_toggle: false
+          entities:
+            - type: conditional
+              conditions:
+                - condition: state
+                  entity: input_select.led_effect
+                  state: sparkle
+              row:
+                entity: input_boolean.led_sparkle_use_multicolor
+            - type: conditional
+              conditions:
+                - condition: state
+                  entity: input_select.led_effect
+                  state: theater-chase
+              row:
+                entity: input_boolean.led_theater_chase_use_rainbow
+            - type: conditional
+              conditions:
+                - condition: state
+                  entity: input_select.led_effect
+                  state: set-color
+              row:
+                entity: input_boolean.led_set_color_use_white
+          state_color: false
+      - type: conditional
+        conditions:
+          - condition: state
+            entity: input_select.led_effect
+            state_not: bitcoin
+          - condition: state
+            entity: input_select.led_effect
+            state_not: color-fade
+          - condition: state
+            entity: input_select.led_effect
+            state_not: rainbow
+          - condition: state
+            entity: input_select.led_effect
+            state_not: rainbow-cycle
+          - condition: state
+            entity: input_select.led_effect
+            state_not: clear
+          - condition: state
+            entity: input_select.led_effect
+            state_not: set-brightness
+          - condition: state
+            entity: input_select.led_effect
+            state_not: heart-rate
+          - condition: or
+            conditions:
+              - condition: state
+                entity: input_select.led_effect
+                state_not: sparkle
+              - condition: state
+                entity: input_boolean.led_sparkle_use_multicolor
+                state: "off"
+          - condition: or
+            conditions:
+              - condition: state
+                entity: input_select.led_effect
+                state_not: theater-chase
+              - condition: state
+                entity: input_boolean.led_theater_chase_use_rainbow
+                state: "off"
+          - condition: or
+            conditions:
+              - condition: state
+                entity: input_select.led_effect
+                state_not: set-color
+              - condition: state
+                entity: input_boolean.led_set_color_use_white
+                state: "off"
+        card:
+          shorten_cards: false
+          consolidate_entities: false
+          child_card: true
+          hide_header: true
+          show_header_icon: false
+          header: Select Color
+          color_wheel: true
+          persist_features: false
+          brightness: false
+          color_temp: false
+          white_value: false
+          color_picker: true
+          speed: false
+          intensity: false
+          force_features: false
+          show_slider_percent: false
+          full_width_sliders: false
+          brightness_icon: weather-sunny
+          white_icon: file-word-box
+          temperature_icon: thermometer
+          speed_icon: speedometer
+          intensity_icon: transit-connection-horizontal
+          type: custom:light-entity-card
+          entity: light.led_truss_color_picker
+          show_effect: false
+          full_width_controls: true
+          effects_list: false
+      - type: conditional
+        conditions:
+          - condition: state
+            entity: input_select.led_effect
+            state: bitcoin
+        card:
+          type: entities
+          title: Bitcoin Monitor
+          show_header_toggle: false
+          entities:
+            - input_number.led_time_threshold_in_secs
+      - type: conditional
+        conditions:
+          - condition: state
+            entity: input_select.led_effect
+            state: color-fade
+        card:
+          type: entities
+          title: Color Fade
+          show_header_toggle: false
+          entities:
+            - entity: input_number.led_color_from_r
+            - entity: input_number.led_color_from_g
+            - entity: input_number.led_color_from_b
+            - entity: input_number.led_color_to_r
+            - entity: input_number.led_color_to_g
+            - entity: input_number.led_color_to_b
+      - type: conditional
+        conditions:
+          - condition: state
+            entity: input_select.led_effect
+            state: rainbow-cycle
+        card:
+          type: entities
+          title: Rainbow Cycle
+          show_header_toggle: false
+          entities:
+            - input_number.led_wait_ms
+            
+      - type: conditional
+        conditions:
+          - condition: state
+            entity: input_select.led_effect
+            state: rainbow
+        card:
+          type: entities
+          title: Rainbow
+          show_header_toggle: false
+          entities:
+            - input_number.led_wait_ms
+            
+  - type: grid
+    cards:
+      - show_name: true
+        show_icon: true
+        type: button
+        tap_action:
+          action: call-service
+          service: script.run_led_effect
+        name: Run Effect
+        icon: mdi:send
+        grid_options:
+          columns: full
+          rows: 5
+      
+header:
+  layout: start
+  badges_position: top
+max_columns: 4
+title: LED
+icon: mdi:led-strip-variant
+cards: []

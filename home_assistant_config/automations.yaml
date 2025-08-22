@@ -1,0 +1,65 @@
+- alias: "LED Truss Sync Color Picker to RGB Inputs"
+  description: "Updates RGB input numbers when the helper light color changes"
+  trigger:
+    - platform: state
+      entity_id: light.led_truss_color_picker
+      attribute: rgb_color
+      not_to:
+        - none
+        - unknown
+  condition:
+    - condition: template
+      value_template: >
+        {{ trigger.to_state.attributes.rgb_color !=
+           [states('input_number.led_color_r')|int(0), states('input_number.led_color_g')|int(0), states('input_number.led_color_b')|int(0)] }}
+  action:
+    - service: input_number.set_value
+      target:
+        entity_id: input_number.led_color_r
+      data:
+        value: "{{ trigger.to_state.attributes.rgb_color[0] }}"
+    - service: input_number.set_value
+      target:
+        entity_id: input_number.led_color_g
+      data:
+        value: "{{ trigger.to_state.attributes.rgb_color[1] }}"
+    - service: input_number.set_value
+      target:
+        entity_id: input_number.led_color_b
+      data:
+        value: "{{ trigger.to_state.attributes.rgb_color[2] }}"
+  mode: single # Prevent race conditions if light changes rapidly
+
+- alias: "LED Truss Sync RGB Inputs to Color Picker"
+  description: "Updates the helper light color when RGB input numbers change"
+  trigger:
+    - platform: state
+      entity_id:
+        - input_number.led_color_r
+        - input_number.led_color_g
+        - input_number.led_color_b
+      not_to:
+        - none
+        - unknown
+  condition:
+    - condition: template
+      value_template: >
+        {% set rgb_inputs = [states('input_number.led_color_r')|int(0),
+                             states('input_number.led_color_g')|int(0),
+                             states('input_number.led_color_b')|int(0)] %}
+        {{ rgb_inputs != state_attr('light.led_truss_color_picker', 'rgb_color') }}
+  action:
+    - service: light.turn_on
+      target:
+        entity_id: light.led_truss_color_picker
+      data:
+        rgb_color:
+          - "{{ states('input_number.led_color_r') | int(0) }}"
+          - "{{ states('input_number.led_color_g') | int(0) }}"
+          - "{{ states('input_number.led_color_b') | int(0) }}"
+        # Optionally set brightness if you integrate brightness control later
+        # brightness: "{{ states('input_number.led_brightness') | int(128) }}"
+  mode: queued # Use queued or parallel if inputs change rapidly
+  max_exceeded: silent 
+
+ 

@@ -1,0 +1,21 @@
+led_effect:
+  name: LED Effect
+  options:
+    - bitcoin
+    - glow
+    - wave
+    - color-wipe
+    - color-fade
+    - sparkle
+    - rainbow
+    - rainbow-cycle
+    - theater-chase
+    - running
+    - clear
+    - set-color
+    - set-brightness
+    - set-color-range-percent
+    - set-color-range-exact
+    - heart-rate
+  initial: glow
+  icon: mdi:string-lights 
