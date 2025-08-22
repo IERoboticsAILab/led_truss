@@ -4,7 +4,7 @@ FastAPI service to control WS281x LED strips mounted on a truss. Provides REST e
 
 ### Features
 - Direct control: clear, set color, set brightness, color by range
-- Effects: glow, wave, color wipe, color fade, sparkle, rainbow, rainbow cycle, theater chase, running
+- Effects: bitcoin, glow, wave, color wipe, color fade, sparkle, rainbow, rainbow cycle, theater chase, running, heart‑rate
 - Heart‑rate visualization using Playwright (Chromium headless)
 - Home Assistant Lovelace controls and automations
 
@@ -114,14 +114,14 @@ sudo systemctl enable --now led-truss
 # Set all LEDs to white
 curl -X POST http://<pi-ip>:8000/control/set-color
 
-# Rainbow cycle for 5 iterations
-curl -X POST http://<pi-ip>:8000/effects/rainbow-cycle -H "Content-Type: application/json" -d '{"wait_ms":50,"iterations":5}'
+# Rainbow cycle (runs continuously until stopped)
+curl -X POST http://<pi-ip>:8000/effects/rainbow-cycle -H "Content-Type: application/json" -d '{"wait_ms":50}'
 
 # Clear
 curl -X POST http://<pi-ip>:8000/control/clear
 ```
 
-More examples are in `led_api_curl_guide.md`.
+See the API quick reference below.
 
 ---
 
@@ -131,7 +131,7 @@ More examples are in `led_api_curl_guide.md`.
 - Direct control endpoints are under `/control/*`
 - Effects endpoints are under `/effects/*`
 
-Detailed endpoint reference: see `led_strip_api_documentation.md`.
+See the API quick reference below.
 
 ---
 
@@ -180,6 +180,38 @@ effects_map.json  # Descriptions and defaults for effects
 ```
 
 ---
+
+### API quick reference
+
+All effects run continuously until a new effect starts or you clear the LEDs. To stop and clear: `POST /control/clear`.
+
+- Base URL: `http://<pi-ip>:8000`
+- OpenAPI docs: `http://<pi-ip>:8000/docs`
+- Effects metadata (names, params, defaults): `GET /effects`
+
+Control endpoints:
+- `POST /control/clear` — no body
+- `POST /control/set-color` — `{ "color": {"r": 255, "g": 255, "b": 255 } }` (optional color)
+- `POST /control/set-brightness` — `{ "brightness": 125 }`
+- `POST /control/set-color-range-percent` — `{ "color": {..}, "start_percent": 0.0, "end_percent": 1.0 }`
+- `POST /control/set-color-range-exact` — `{ "color": {..}, "start_index": 0, "end_index": 1800 }`
+
+Effects endpoints (see `GET /effects` for full parameter schemas):
+- `POST /effects/bitcoin` — `{ "time_threshold_in_secs": 30 }`
+- `POST /effects/glow` — `{ "color": {..}, "wait_ms": 10 }`
+- `POST /effects/wave` — `{ "color": {..}, "cycles": 1, "speed": 0.1, "wait_ms": 10 }`
+- `POST /effects/color-wipe` — `{ "color": {..}, "wait_ms": 50 }`
+- `POST /effects/color-fade` — `{ "color_from": {..}, "color_to": {..}, "wait_ms": 20, "steps": 100 }`
+- `POST /effects/sparkle` — `{ "color": {..} | null, "wait_ms": 50, "cummulative": false }`
+- `POST /effects/rainbow` — `{ "wait_ms": 50 }`
+- `POST /effects/rainbow-cycle` — `{ "wait_ms": 50 }`
+- `POST /effects/theater-chase` — `{ "color": {..} | null, "wait_ms": 50 }`
+- `POST /effects/running` — `{ "wait_ms": 10, "width": 1 }`
+- `POST /effects/heart-rate` — `{ "url": "https://...", "poll_interval": 1.0, "min_hr": 40, "yellow_start": 75, "red_start": 120, "max_hr": 200 }`
+
+Notes:
+- Start a new effect to stop the previous one automatically.
+- Use `/control/clear` to stop and turn off all LEDs.
 
 ### License
 MIT (or your preferred license). Update as appropriate.

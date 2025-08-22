@@ -70,14 +70,6 @@ led_color_to_b:
   mode: slider
   initial: 255
   icon: mdi:format-color-fill
-led_frames:
-  name: Frames
-  min: 1
-  max: 1000
-  step: 10
-  mode: slider
-  initial: 300
-  icon: mdi:animation-play
 led_wait_ms:
   name: Wait (ms)
   min: 0
@@ -110,22 +102,6 @@ led_steps:
   mode: slider
   initial: 100
   icon: mdi:stairs
-led_iterations:
-  name: Iterations
-  min: 1
-  max: 20
-  step: 1
-  mode: slider
-  initial: 5
-  icon: mdi:infinity
-led_duration_ms:
-  name: Duration (ms)
-  min: 100
-  max: 60000
-  step: 100
-  mode: slider
-  initial: 18000
-  icon: mdi:clock-time-eight-outline
 led_width:
   name: Width (pixels)
   min: 1
@@ -174,14 +150,6 @@ led_end_index:
   mode: slider
   initial: 1800
   icon: mdi:page-last
-led_duration: # For bitcoin effect
-  name: Duration (s)
-  min: 10
-  max: 300
-  step: 10
-  mode: slider
-  initial: 60
-  icon: mdi:timer-outline
 led_time_threshold_in_secs: # For bitcoin effect
   name: Threshold (s)
   min: 5
@@ -190,14 +158,6 @@ led_time_threshold_in_secs: # For bitcoin effect
   mode: slider
   initial: 30
   icon: mdi:timelapse 
-led_hr_duration:
-  name: HR Duration (s)
-  min: 10
-  max: 3600
-  step: 10
-  mode: slider
-  initial: 300
-  icon: mdi:timer-outline
 led_hr_poll:
   name: HR Poll (Hz)
   min: 0.5
@@ -238,3 +198,12 @@ led_hr_max:
   mode: slider
   initial: 200
   icon: mdi:heart-multiple
+led_timer_add_minutes:
+  name: LED Timer Add (minutes)
+  min: 1
+  max: 120
+  step: 1
+  mode: box
+  unit_of_measurement: min
+  icon: mdi:timer-plus
+  initial: 10

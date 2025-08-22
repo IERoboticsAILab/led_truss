@@ -7,3 +7,23 @@ run_led_effect:
 # Placeholder script needed by the template light's set_level service
 do_nothing:
   sequence: [] 
+
+led_timer_add_minutes:
+  alias: LED Timer - Add Minutes
+  sequence:
+    - variables:
+        add_secs: "{{ (states('input_number.led_timer_add_minutes') | int(10)) * 60 }}"
+        remaining_str: "{{ state_attr('timer.led_truss_timer', 'remaining') }}"
+        remaining_secs: >-
+          {% if remaining_str %}
+            {% set t = strptime(remaining_str, '%H:%M:%S') %}
+            {{ (t.hour * 3600 + t.minute * 60 + t.second) }}
+          {% else %}
+            0
+          {% endif %}
+        new_duration: "{{ (remaining_secs + add_secs) | int }}"
+    - service: timer.start
+      target:
+        entity_id: timer.led_truss_timer
+      data:
+        duration: "{{ new_duration }}" 

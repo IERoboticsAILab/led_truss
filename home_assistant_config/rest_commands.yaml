@@ -12,9 +12,7 @@ send_led_effect:
     {% set g = states('input_number.led_color_g') | int(0) %}
     {% set b = states('input_number.led_color_b') | int(0) %}
     {% set wait = states('input_number.led_wait_ms') | int(50) %}
-    {% set iterations = states('input_number.led_iterations') | int(1) %}
-    {% set frames = states('input_number.led_frames') | int(300) %}
-    {% set hr_duration = states('input_number.led_hr_duration') | int(300) %}
+    {# removed: iterations, frames, hr_duration (effects run until stopped) #}
     {% set hr_poll_hz = states('input_number.led_hr_poll') | float(1.0) %}
     {% set hr_min = states('input_number.led_hr_min') | int(40) %}
     {% set hr_yellow = states('input_number.led_hr_yellow_start') | int(75) %}
@@ -26,15 +24,12 @@ send_led_effect:
 
     {# Conditionally add items to the list using list concatenation - Use hyphens in conditions #}
     {% if effect == 'bitcoin' %}
-      {% set payload_items = payload_items + ['"duration": ' + (states('input_number.led_duration') | int(60) | string)] %}
       {% set payload_items = payload_items + ['"time_threshold_in_secs": ' + (states('input_number.led_time_threshold_in_secs') | int(30) | string)] %}
     {% elif effect == 'glow' %}
       {% set payload_items = payload_items + ['"color": {"r": ' + (r|string) + ', "g": ' + (g|string) + ', "b": ' + (b|string) + '}'] %}
-      {% set payload_items = payload_items + ['"frames": ' + (frames|string)] %}
       {% set payload_items = payload_items + ['"wait_ms": ' + (wait|string)] %}
     {% elif effect == 'wave' %}
       {% set payload_items = payload_items + ['"color": {"r": ' + (r|string) + ', "g": ' + (g|string) + ', "b": ' + (b|string) + '}'] %}
-      {% set payload_items = payload_items + ['"frames": ' + (frames|string)] %}
       {% set payload_items = payload_items + ['"cycles": ' + (states('input_number.led_cycles') | int(1) | string)] %}
       {% set payload_items = payload_items + ['"speed": ' + (states('input_number.led_speed') | float(0.1) | string)] %}
       {% set payload_items = payload_items + ['"wait_ms": ' + (wait|string)] %}
@@ -60,23 +55,18 @@ send_led_effect:
       {% set payload_items = payload_items + ['"cummulative": ' + ('true' if is_state('input_boolean.led_cummulative', 'on') else 'false')] %}
     {% elif effect == 'rainbow' %}
       {% set payload_items = payload_items + ['"wait_ms": ' + (wait|string)] %}
-      {% set payload_items = payload_items + ['"iterations": ' + (iterations|string)] %}
     {% elif effect == 'rainbow-cycle' %}
       {% set payload_items = payload_items + ['"wait_ms": ' + (wait|string)] %}
-      {% set payload_items = payload_items + ['"iterations": ' + (iterations|string)] %}
     {% elif effect == 'theater-chase' %}
       {% if is_state('input_boolean.led_theater_chase_use_rainbow', 'off') %}
         {% set payload_items = payload_items + ['"color": {"r": ' + (r|string) + ', "g": ' + (g|string) + ', "b": ' + (b|string) + '}'] %}
       {% endif %}
       {% set payload_items = payload_items + ['"wait_ms": ' + (wait|string)] %}
-      {% set payload_items = payload_items + ['"iterations": ' + (iterations|string)] %}
     {% elif effect == 'running' %}
       {% set payload_items = payload_items + ['"wait_ms": ' + (wait|string)] %}
-      {% set payload_items = payload_items + ['"duration_ms": ' + (states('input_number.led_duration_ms') | int(18000) | string)] %}
       {% set payload_items = payload_items + ['"width": ' + (states('input_number.led_width') | int(1) | string)] %}
     {% elif effect == 'heart-rate' %}
       {% set payload_items = payload_items + ['"url": "' ~ hr_url ~ '"'] %}
-      {% set payload_items = payload_items + ['"duration": ' + (hr_duration | string)] %}
       {% set payload_items = payload_items + ['"poll_interval": ' + (hr_poll_hz | string)] %}
       {% set payload_items = payload_items + ['"min_hr": ' + (hr_min | string)] %}
       {% set payload_items = payload_items + ['"yellow_start": ' + (hr_yellow | string)] %}

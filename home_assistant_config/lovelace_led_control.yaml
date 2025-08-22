@@ -43,7 +43,6 @@ sections:
           show_header_toggle: false
           entities:
             - entity: input_number.led_wait_ms
-            - entity: input_number.led_iterations
       - type: conditional
         conditions:
           - condition: state
@@ -55,7 +54,6 @@ sections:
           show_header_toggle: false
           entities:
             - input_text.led_hr_url
-            - input_number.led_hr_duration
             - input_number.led_hr_poll
             - input_number.led_hr_min
             - input_number.led_hr_yellow_start
@@ -71,7 +69,6 @@ sections:
           show_header_toggle: false
           entities:
             - entity: input_number.led_wait_ms
-            - entity: input_number.led_frames
       - type: conditional
         conditions:
           - condition: state
@@ -82,7 +79,6 @@ sections:
           show_header_toggle: false
           entities:
             - entity: input_number.led_wait_ms
-            - entity: input_number.led_frames
             - entity: input_number.led_cycles
             - entity: input_number.led_speed
       - type: conditional
@@ -119,7 +115,6 @@ sections:
           show_header_toggle: false
           entities:
             - entity: input_number.led_wait_ms
-            - entity: input_number.led_duration_ms
             - entity: input_number.led_width
       - type: conditional
         conditions:
@@ -270,7 +265,6 @@ sections:
           title: Bitcoin Monitor
           show_header_toggle: false
           entities:
-            - input_number.led_duration
             - input_number.led_time_threshold_in_secs
       - type: conditional
         conditions:
@@ -299,7 +293,7 @@ sections:
           show_header_toggle: false
           entities:
             - input_number.led_wait_ms
-            - input_number.led_iterations
+            
       - type: conditional
         conditions:
           - condition: state
@@ -311,7 +305,7 @@ sections:
           show_header_toggle: false
           entities:
             - input_number.led_wait_ms
-            - input_number.led_iterations
+            
   - type: grid
     cards:
       - show_name: true
@@ -325,6 +319,13 @@ sections:
         grid_options:
           columns: full
           rows: 5
+      - type: entities
+        title: LED Timer
+        show_header_toggle: false
+        entities:
+          - timer.led_truss_timer
+          - input_number.led_timer_add_minutes
+          - script.led_timer_add_minutes
 header:
   layout: start
   badges_position: top
