@@ -2,6 +2,7 @@ import time
 import numpy as np
 import random
 import requests
+import threading
 from rpi_ws281x import *
 
 class truss:
@@ -37,6 +38,40 @@ class truss:
 
         self.strip1.begin()
         self.strip2.begin()
+
+        # Effect orchestration
+        self._lock = threading.Lock()
+        self._cancel_event = threading.Event()
+        self._effect_thread = None
+
+    def _run_effect(self, target, args):
+        try:
+            target(*args)
+        finally:
+            with self._lock:
+                self._effect_thread = None
+
+    def stop_effect(self, timeout=2.0):
+        with self._lock:
+            thread = self._effect_thread
+            if thread is None:
+                return
+            self._cancel_event.set()
+        thread.join(timeout=timeout)
+        with self._lock:
+            if self._effect_thread is thread:
+                self._effect_thread = None
+            self._cancel_event.clear()
+
+    def start_effect(self, effect_name, *args, clear_first=True):
+        self.stop_effect()
+        if clear_first:
+            self.clear_all()
+        effect_fn = getattr(self, effect_name)
+        with self._lock:
+            self._cancel_event.clear()
+            self._effect_thread = threading.Thread(target=self._run_effect, args=(effect_fn, args), daemon=True)
+            self._effect_thread.start()
 
     # Auxiliary Functions
     def set_pixel_color(self, pixel_index, color):
@@ -108,36 +143,46 @@ class truss:
         self.show()
 
     # Vizualtion effects
-    ## Glowing effect
-    def glow(self, color, frames=300, wait_ms=10):
-        cos_lookup = (np.cos(np.linspace(np.pi, np.pi*3, frames)) + 1) * 0.5
-        color_lookup = np.tile(np.array((color.r, color.g, color.b), dtype=np.uint8), [frames, self.LED_COUNT])
-        cos_color_table = np.multiply(color_lookup, cos_lookup[:, np.newaxis],).astype(int)
-        
-        for f in range(frames):
+    ## Glowing effect (runs continuously until stopped)
+    def glow(self, color, wait_ms=10):
+        phase = 0.0
+        while True:
+            if self._cancel_event.is_set():
+                return
+            brightness_scale = (1.0 - np.cos(phase)) * 0.5
+            r = int(color.r * brightness_scale)
+            g = int(color.g * brightness_scale)
+            b = int(color.b * brightness_scale)
+            c = Color(r, g, b)
             for i in range(self.LED_COUNT):
-                c = Color(cos_color_table[f][i*3], cos_color_table[f][(i*3)+1], cos_color_table[f][(i*3)+2])
                 self.set_pixel_color(i, c)
             self.show()
+            phase += 0.1
             time.sleep(wait_ms / 1000.0)
 
-    ## Sends moving cosine waves (with amplitude 1) throughtout the LEDs
-    def wave(self, color, frames=300, cycles=1, speed=0.1, wait_ms=10):
-        for i in range(frames):
+    ## Sends moving cosine waves (with amplitude 1) throughtout the LEDs (continuous)
+    def wave(self, color, cycles=1, speed=0.1, wait_ms=10):
+        i = 0
+        while True:
+            if self._cancel_event.is_set():
+                return
             cos_lookup = (np.cos(np.linspace(np.pi-(i*speed), (np.pi*(cycles*3))-(i*speed), self.LED_COUNT)) + 1) * 0.5
             color_lookup = np.tile(np.array((color.r, color.g, color.b), dtype=np.uint8), [self.LED_COUNT, 1])
             cos_color_table = np.multiply(color_lookup, cos_lookup[:, np.newaxis],).astype(int)
-        
-            for i in range(self.LED_COUNT):
-                c = Color(cos_color_table[i][0], cos_color_table[i][1], cos_color_table[i][2])
-                self.set_pixel_color(i, c)
-            
+
+            for j in range(self.LED_COUNT):
+                c = Color(cos_color_table[j][0], cos_color_table[j][1], cos_color_table[j][2])
+                self.set_pixel_color(j, c)
+
             self.show()
+            i += 1
             time.sleep(wait_ms / 1000.0)
 
     ## Wipe color across the display one pixel at a time
     def color_wipe(self, color, wait_ms=50):
         for i in range(self.LED_COUNT):
+            if self._cancel_event.is_set():
+                return
             self.set_pixel_color(i, color)
             self.show()
             time.sleep(wait_ms / 1000.0)
@@ -153,6 +198,8 @@ class truss:
         b = color_from.b
 
         for x in range(steps):
+            if self._cancel_event.is_set():
+                return
             c = Color(int(r), int(g), int(b))
             for i in range(self.LED_COUNT):
                 self.set_pixel_color(i, c)
@@ -166,6 +213,8 @@ class truss:
     def sparkle(self, color, wait_ms=50, cummulative=False):
         self.clear_all()
         for i in range (0, self.LED_COUNT):
+            if self._cancel_event.is_set():
+                return
             self.set_pixel_color(random.randrange(0, self.LED_COUNT), color)
             self.show()
             time.sleep(wait_ms / 1000.0)
@@ -177,6 +226,8 @@ class truss:
     def sparkle_multicolor(self, wait_ms=50, cummulative=False):
         self.clear_all()
         for i in range (0, self.LED_COUNT):
+            if self._cancel_event.is_set():
+                return
             self.set_pixel_color(random.randrange(0, self.LED_COUNT), Color(random.randrange(0, 256), random.randrange(0, 256), random.randrange(0, 256)))
             self.show()
             time.sleep(wait_ms / 1000.0)
@@ -184,27 +235,38 @@ class truss:
                 self.clear_all()
         time.sleep(wait_ms / 1000.0)
 
-    ## Draw rainbow that fades across all pixels at once
-    def rainbow(self, wait_ms=50, iterations=1):
-        for j in range(256 * iterations):
+    ## Draw rainbow that fades across all pixels at once (continuous)
+    def rainbow(self, wait_ms=50):
+        j = 0
+        while True:
+            if self._cancel_event.is_set():
+                return
             for i in range(self.LED_COUNT):
                 self.set_pixel_color(i, self.wheel((i + j) & 255))
             self.show()
+            j = (j + 1) % 256
             time.sleep(wait_ms / 1000.0)
 
-    ## Draw rainbow that uniformly distributes itself across all pixels
-    def rainbow_cycle(self, wait_ms=50, iterations=5):
-        for j in range(256 * iterations):
+    ## Draw rainbow that uniformly distributes itself across all pixels (continuous)
+    def rainbow_cycle(self, wait_ms=50):
+        j = 0
+        while True:
+            if self._cancel_event.is_set():
+                return
             for i in range(self.LED_COUNT):
-                self.set_pixel_color(i, self.wheel(
-                    (int(i * 256 / self.LED_COUNT) + j) & 255))
+                self.set_pixel_color(i, self.wheel((int(i * 256 / self.LED_COUNT) + j) & 255))
             self.show()
+            j = (j + 1) % 256
             time.sleep(wait_ms / 1000.0)
 
-    ## Movie theater light style chaser animation
-    def theater_chase(self, color, wait_ms=50, iterations=10):
-        for j in range(iterations):
+    ## Movie theater light style chaser animation (continuous)
+    def theater_chase(self, color, wait_ms=50):
+        while True:
+            if self._cancel_event.is_set():
+                return
             for q in range(3):
+                if self._cancel_event.is_set():
+                    return
                 for i in range(0, self.LED_COUNT, 3):
                     self.set_pixel_color(i + q, color)
                 self.show()
@@ -216,6 +278,8 @@ class truss:
     ## It will cycle through all the colors
     def theater_chase_rainbow(self, wait_ms=50):
         for j in range(256):
+            if self._cancel_event.is_set():
+                return
             for q in range(3):
                 for i in range(0, self.LED_COUNT, 3):
                     self.set_pixel_color(i + q, self.wheel((i + j) % 255))
@@ -224,19 +288,20 @@ class truss:
                 for i in range(0, self.LED_COUNT, 3):
                     self.set_pixel_color(i + q, 0)
 
-    def running(self, wait_ms = 10, duration_ms = 18000, width = 1):
+    def running(self, wait_ms = 10, width = 1):
         self.clear_all()
         index = 0
-        while duration_ms > 0:
+        while True:
+            if self._cancel_event.is_set():
+                return
             self.set_pixel_color((index - width) % self.LED_COUNT, Color(0,0,0))
             self.set_pixel_color(index, Color(255,0,0))
             self.show()
             index = (index + 1) % self.LED_COUNT
-            duration_ms -= wait_ms
             time.sleep(wait_ms / 1000)
 
 
-    def bitcoin(self, duration = 60, time_threshold_in_secs = 30):
+    def bitcoin(self, time_threshold_in_secs = 30):
         """Monitor Bitcoin price and show changes on the LED truss.
         
         Args:
@@ -248,9 +313,10 @@ class truss:
         """
         key = "https://api.binance.com/api/v3/ticker/price?symbol=BTCEUR"
         previous_price = 0
-        total_end_time = time.time() + duration
 
-        while time.time() < total_end_time:
+        while True:
+            if self._cancel_event.is_set():
+                return
             # Get current Bitcoin price
             data = requests.get(key, timeout=5).json()
             current_price = float(data['price'])
@@ -260,17 +326,23 @@ class truss:
 
             if current_price > previous_price:
                 while time.time() < timeout:
+                    if self._cancel_event.is_set():
+                        return
                     self.glow(Color(0, 255, 0))  # Green for price increase
             elif current_price < previous_price:
                 while time.time() < timeout:
+                    if self._cancel_event.is_set():
+                        return
                     self.glow(Color(255, 0, 0))  # Red for price decrease
             else:
                 while time.time() < timeout:
+                    if self._cancel_event.is_set():
+                        return
                     self.glow(Color(255, 255, 255))  # White for no change
             
             previous_price = current_price
 
-    def heart_rate(self, url, duration = 300, poll_hz = 1.0, min_hr = 40, yellow_start = 75, red_start = 120, max_hr = 200):
+    def heart_rate(self, url, poll_hz = 1.0, min_hr = 40, yellow_start = 75, red_start = 120, max_hr = 200):
         """Read heart rate from an app.heart.io-like widget and map value to color.
 
         Simple implementation: open the page, read `.heartrate` every tick, set color.
@@ -308,57 +380,59 @@ class truss:
 
         with sync_playwright() as p:
             browser = p.chromium.launch(headless=True)
-            pages = []
-            for u in urls:
-                pg = browser.new_page()
-                pg.goto(u, wait_until="domcontentloaded")
-                pg.wait_for_selector(".heartrate", timeout=20000)
-                pages.append(pg)
+            try:
+                pages = []
+                for u in urls:
+                    pg = browser.new_page()
+                    pg.goto(u, wait_until="domcontentloaded")
+                    pg.wait_for_selector(".heartrate", timeout=20000)
+                    pages.append(pg)
 
-            end_time = time.time() + duration
-            latest_hr = None
-            next_poll_time = 0.0
-            poll_period = 1.0 / float(max(0.1, poll_hz))
-            while time.time() < end_time:
-                now = time.time()
-                # Polling in Hz
-                if now >= next_poll_time:
-                    values = []
-                    for pg in pages:
-                        try:
-                            text = pg.inner_text(".heartrate")
-                            digits = ''.join(ch for ch in text if ch.isdigit())
-                            if digits:
-                                values.append(int(digits))
-                        except Exception:
-                            # Ignore read errors for individual pages in this cycle
-                            pass
-                    if values:
-                        latest_hr = int(round(sum(values) / float(len(values))))
-                    next_poll_time = now + poll_period
+                latest_hr = None
+                next_poll_time = 0.0
+                poll_period = 1.0 / float(max(0.1, poll_hz))
+                while True:
+                    if self._cancel_event.is_set():
+                        return
+                    now = time.time()
+                    # Polling in Hz
+                    if now >= next_poll_time:
+                        values = []
+                        for pg in pages:
+                            try:
+                                text = pg.inner_text(".heartrate")
+                                digits = ''.join(ch for ch in text if ch.isdigit())
+                                if digits:
+                                    values.append(int(digits))
+                            except Exception:
+                                # Ignore read errors for individual pages in this cycle
+                                pass
+                        if values:
+                            latest_hr = int(round(sum(values) / float(len(values))))
+                        next_poll_time = now + poll_period
 
-                # Determine color from latest HR (fallback to green if unknown)
-                base_rgb = (0, 255, 0) if latest_hr is None else color_from_hr(latest_hr)
+                    # Determine color from latest HR (fallback to green if unknown)
+                    base_rgb = (0, 255, 0) if latest_hr is None else color_from_hr(latest_hr)
 
-                # Glow at HR frequency: brightness follows cosine with period derived from BPM
-                if latest_hr is not None and latest_hr > 0:
-                    period = compute_bpm_period_seconds(latest_hr)
-                    # map current time to [0..1] phase
-                    phase = (now % period) / period
-                    # cosine brightness [0..1]
-                    brightness_scale = (1.0 - np.cos(phase * 2 * np.pi)) * 0.5
-                else:
-                    brightness_scale = 1.0
+                    # Glow at HR frequency: brightness follows cosine with period derived from BPM
+                    if latest_hr is not None and latest_hr > 0:
+                        period = compute_bpm_period_seconds(latest_hr)
+                        # map current time to [0..1] phase
+                        phase = (now % period) / period
+                        # cosine brightness [0..1]
+                        brightness_scale = (1.0 - np.cos(phase * 2 * np.pi)) * 0.5
+                    else:
+                        brightness_scale = 1.0
 
-                # Apply scaled brightness to the display color
-                r = int(base_rgb[0] * brightness_scale)
-                g = int(base_rgb[1] * brightness_scale)
-                b = int(base_rgb[2] * brightness_scale)
-                scaled_color = Color(r, g, b)
-                self.set_color_all(scaled_color)
+                    # Apply scaled brightness to the display color
+                    r = int(base_rgb[0] * brightness_scale)
+                    g = int(base_rgb[1] * brightness_scale)
+                    b = int(base_rgb[2] * brightness_scale)
+                    scaled_color = Color(r, g, b)
+                    self.set_color_all(scaled_color)
 
-                # Small frame delay for smooth animation
-                time.sleep(0.02)
-
-            browser.close()
+                    # Small frame delay for smooth animation
+                    time.sleep(0.02)
+            finally:
+                browser.close()
         

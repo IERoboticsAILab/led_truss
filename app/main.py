@@ -94,6 +94,16 @@ def create_app() -> FastAPI:
             # Catch any other unexpected errors during map loading
              raise HTTPException(status_code=500, detail=f"An unexpected error occurred: {e}")
 
+    @app.on_event("shutdown")
+    def on_shutdown():
+        try:
+            tc = get_truss_controller()
+            tc.stop_effect()
+            tc.clear_all()
+            print("Shutdown: stopped current effect and cleared LEDs.")
+        except Exception as e:
+            print(f"Shutdown cleanup error: {e}")
+
     print("FastAPI app creation complete.")
     return app
 

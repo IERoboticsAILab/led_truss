@@ -2,11 +2,6 @@
   "bitcoin": {
     "description": "Monitor Bitcoin price and show changes with color indicators",
     "params": {
-      "duration": {
-        "type": "int",
-        "description": "Total duration to monitor in seconds",
-        "default": 60
-      },
       "time_threshold_in_secs": {
         "type": "int",
         "description": "How long to show each price change",
@@ -22,11 +17,6 @@
         "description": "RGB color values",
         "default": [255, 255, 255]
       },
-      "frames": {
-        "type": "int",
-        "description": "Number of animation frames",
-        "default": 300
-      },
       "wait_ms": {
         "type": "int",
         "description": "Delay between frames in milliseconds",
@@ -41,11 +31,6 @@
         "type": "tuple[int, int, int]",
         "description": "RGB color values",
         "default": [255, 255, 255]
-      },
-      "frames": {
-        "type": "int",
-        "description": "Number of animation frames",
-        "default": 300
       },
       "cycles": {
         "type": "int",
@@ -131,11 +116,6 @@
         "type": "int",
         "description": "Delay between updates in milliseconds",
         "default": 50
-      },
-      "iterations": {
-        "type": "int",
-        "description": "Number of complete rainbow cycles",
-        "default": 1
       }
     }
   },
@@ -146,11 +126,6 @@
         "type": "int",
         "description": "Delay between updates in milliseconds",
         "default": 50
-      },
-      "iterations": {
-        "type": "int",
-        "description": "Number of complete rainbow cycles",
-        "default": 5
       }
     }
   },
@@ -166,11 +141,6 @@
         "type": "int",
         "description": "Delay between moves in milliseconds",
         "default": 50
-      },
-      "iterations": {
-        "type": "int",
-        "description": "Number of complete chase cycles",
-        "default": 10
       }
     }
   },
@@ -181,11 +151,6 @@
         "type": "int",
         "description": "Delay between moves in milliseconds",
         "default": 10
-      },
-      "duration_ms": {
-        "type": "int",
-        "description": "Total duration of effect in milliseconds",
-        "default": 18000
       },
       "width": {
         "type": "int",
@@ -201,11 +166,6 @@
         "type": "string",
         "description": "One or more HTTP(S) URLs (comma-separated) each with a .heartrate element",
         "default": "https://app.hyperate.io/74524/"
-      },
-      "duration": {
-        "type": "int",
-        "description": "Total duration to monitor in seconds",
-        "default": 300
       },
       "poll_interval": {
         "type": "float",
