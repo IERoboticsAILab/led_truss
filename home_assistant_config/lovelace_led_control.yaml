@@ -319,13 +319,7 @@ sections:
         grid_options:
           columns: full
           rows: 5
-      - type: entities
-        title: LED Timer
-        show_header_toggle: false
-        entities:
-          - timer.led_truss_timer
-          - input_number.led_timer_add_minutes
-          - script.led_timer_add_minutes
+      
 header:
   layout: start
   badges_position: top

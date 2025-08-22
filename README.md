@@ -188,7 +188,7 @@ All effects run continuously until a new effect starts or you clear the LEDs. To
 - Base URL: `http://<pi-ip>:8000`
 - OpenAPI docs: `http://<pi-ip>:8000/docs`
 - Effects metadata (names, params, defaults): `GET /effects`
-
+ 
 Control endpoints:
 - `POST /control/clear` — no body
 - `POST /control/set-color` — `{ "color": {"r": 255, "g": 255, "b": 255 } }` (optional color)

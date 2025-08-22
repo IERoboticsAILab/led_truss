@@ -1,5 +1,6 @@
 import sys
 import json
+ 
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.exceptions import RequestValidationError
@@ -70,6 +71,8 @@ def create_app() -> FastAPI:
             body_text = "<unavailable>"
         print("Validation error on", request.url.path, "errors=", exc.errors(), "body=", body_text)
         return JSONResponse(status_code=422, content={"detail": exc.errors()})
+
+    # (Timer functionality removed)
 
     # --- Root and General Endpoints ---
     @app.get("/", tags=["General"])

@@ -62,16 +62,4 @@
   mode: queued # Use queued or parallel if inputs change rapidly
   max_exceeded: silent 
 
-- id: led_truss_timer_finished_stop_server
-  alias: LED Truss - Stop on Timer Finish
-  trigger:
-    - platform: event
-      event_type: timer.finished
-      event_data:
-        entity_id: timer.led_truss_timer
-  action:
-    - service: shell_command.stop_led_truss
-    - service: switch.turn_off
-      target:
-        entity_id: switch.led_power_supply_group
-  mode: single 
+ 

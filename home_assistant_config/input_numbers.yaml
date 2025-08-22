@@ -198,12 +198,4 @@ led_hr_max:
   mode: slider
   initial: 200
   icon: mdi:heart-multiple
-led_timer_add_minutes:
-  name: LED Timer Add (minutes)
-  min: 1
-  max: 120
-  step: 1
-  mode: box
-  unit_of_measurement: min
-  icon: mdi:timer-plus
-  initial: 10
+ 
