@@ -59,6 +59,7 @@ sections:
             - input_number.led_hr_yellow_start
             - input_number.led_hr_red_start
             - input_number.led_hr_max
+            - input_boolean.led_hr_pulse
       - type: conditional
         conditions:
           - condition: state

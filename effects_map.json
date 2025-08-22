@@ -191,6 +191,11 @@
         "type": "int",
         "description": "Upper bound for clamping and full red",
         "default": 200
+      },
+      "pulse": {
+        "type": "boolean",
+        "description": "Whether LEDs should pulse at the measured heart rate",
+        "default": true
       }
     }
   },

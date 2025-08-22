@@ -342,7 +342,7 @@ class truss:
             
             previous_price = current_price
 
-    def heart_rate(self, url, poll_hz = 1.0, min_hr = 40, yellow_start = 75, red_start = 120, max_hr = 200):
+    def heart_rate(self, url, poll_hz = 1.0, min_hr = 40, yellow_start = 75, red_start = 120, max_hr = 200, pulse = True):
         """Read heart rate from an app.heart.io-like widget and map value to color.
 
         Simple implementation: open the page, read `.heartrate` every tick, set color.
@@ -409,13 +409,16 @@ class truss:
                                 pass
                         if values:
                             latest_hr = int(round(sum(values) / float(len(values))))
+                        else:
+                            # If no numeric HR is visible (e.g., "-"), treat as 0 to show solid green
+                            latest_hr = 0
                         next_poll_time = now + poll_period
 
                     # Determine color from latest HR (fallback to green if unknown)
                     base_rgb = (0, 255, 0) if latest_hr is None else color_from_hr(latest_hr)
 
-                    # Glow at HR frequency: brightness follows cosine with period derived from BPM
-                    if latest_hr is not None and latest_hr > 0:
+                    # Glow at HR frequency if enabled: brightness follows cosine with period derived from BPM
+                    if pulse and latest_hr is not None and latest_hr > 0:
                         period = compute_bpm_period_seconds(latest_hr)
                         # map current time to [0..1] phase
                         phase = (now % period) / period

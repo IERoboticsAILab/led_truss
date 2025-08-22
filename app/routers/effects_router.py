@@ -95,6 +95,7 @@ def heart_rate_effect(request: HeartRateRequest, truss_controller: truss = Depen
         request.yellow_start,
         request.red_start,
         request.max_hr,
+        request.pulse,
         clear_first=True,
     )
     return {"status": "success"}

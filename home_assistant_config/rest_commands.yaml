@@ -72,6 +72,7 @@ send_led_effect:
       {% set payload_items = payload_items + ['"yellow_start": ' + (hr_yellow | string)] %}
       {% set payload_items = payload_items + ['"red_start": ' + (hr_red | string)] %}
       {% set payload_items = payload_items + ['"max_hr": ' + (hr_max | string)] %}
+      {% set payload_items = payload_items + ['"pulse": ' + ('true' if is_state('input_boolean.led_hr_pulse', 'on') else 'false')] %}
     {% elif effect == 'clear' %}
       {# No payload items needed, results in {} #}
     {% elif effect == 'set-color' %}
