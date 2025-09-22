@@ -186,7 +186,6 @@ led_truss.service # Systemd service file
 All effects run continuously until a new effect starts or you clear the LEDs. To stop and clear: `POST /control/clear`.
 
 - Base URL: `http://<pi-ip>:8000`
-- OpenAPI docs: `http://<pi-ip>:8000/docs`
 - Effects metadata (names, params, defaults): `GET /effects`
  
 Control endpoints:
