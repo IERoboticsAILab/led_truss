@@ -165,25 +165,6 @@ This repository includes example YAML under `home_assistant_config/`:
 
 ---
 
-### Troubleshooting
-- **No LEDs respond**: Check 5V power supply, verify common ground connection, confirm data direction (DIN vs DOUT)
-- **Colors flicker or incorrect**: Add logic-level shifter and series resistor (~300-500Ω) on data lines
-- **Permission errors**: Ensure running with `sudo` for PWM hardware access
-- **Heart-rate effect fails**: Install Playwright Chromium (`python -m playwright install chromium`)
-- **API not accessible**: Check firewall settings and ensure port 8000 is open
-- **CORS issues**: Modify `allow_origins` in `app/main.py` for production use
-- **Some LEDs not working**: Individual LEDs may burn out over time; adjust LED count in configuration if needed
-
----
-
-### Security Considerations
-- **CORS**: Default allows all origins; restrict `allow_origins` in `app/main.py` for production
-- **Network**: API runs on all interfaces (0.0.0.0); use firewall rules to restrict access
-- **Authentication**: No built-in auth; add reverse proxy with auth for internet exposure
-- **System**: Change default Pi passwords and use proper SSH key authentication
-
----
-
 ### Project layout
 ```text
 app/
