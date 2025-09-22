@@ -14,7 +14,7 @@ FastAPI service to control WS2813 (WS281x‑compatible) LED strips mounted on a 
 ---
 
 ### Hardware
-- **Raspberry Pi 4B** with PWM-capable GPIO pins
+- **Raspberry Pi 4B** with PWM-capable GPIO pins (Pi 5 not supported)
 - **WS2813 LED strips** (30m total: 2x 15m sections, ~60 LEDs/meter)
 - **6x 5V/20A DC Power Supply Units** (one every 5m for power injection)
 - **Common ground** between LED power supply and Raspberry Pi
@@ -23,6 +23,7 @@ FastAPI service to control WS2813 (WS281x‑compatible) LED strips mounted on a 
 - **Strip 1 (15m)**: 896 LEDs on GPIO18 (Pin 12), 3x 5m segments with power injection
 - **Strip 2 (15m)**: 894 LEDs on GPIO13 (Pin 33), 3x 5m segments with power injection
 - **Total**: 1790 LEDs (~60 LEDs/meter × 30 meters)
+- **Note**: Some LEDs were removed due to damage/burnout, reducing count from theoretical 1800
 - **Power**: 6x 5V/20A PSUs connected in parallel, one between each 5m segment
 - **Ground**: Connect all LED GND to Pi GND (common ground reference)
 - **Data**: Connect LED data-in (DI) and backup data-in (BI) to respective GPIO pins
@@ -43,6 +44,7 @@ FastAPI service to control WS2813 (WS281x‑compatible) LED strips mounted on a 
 ---
 
 ### Software Prerequisites (on Raspberry Pi)
+- **Raspberry Pi 4B or earlier** (Pi 5 not supported due to `rpi-ws281x` library limitations)
 - **Python 3.9+**
 - **System packages**: `libatlas-base-dev` (for numpy performance), chromium dependencies for Playwright
 - **Python packages**: See `requirements.txt` for exact versions
@@ -52,13 +54,10 @@ FastAPI service to control WS2813 (WS281x‑compatible) LED strips mounted on a 
 
 ### Installation
 ```bash
-# Update system and install dependencies
-sudo apt update
-sudo apt install -y python3-venv libatlas-base-dev
 
 # Clone repository
 cd ~/
-git clone https://github.com/<your-org-or-user>/led_truss.git
+git clone https://github.com/IERoboticsAILab/led_truss.git
 cd led_truss
 
 # Create and activate virtual environment
@@ -66,7 +65,6 @@ python3 -m venv venv
 source venv/bin/activate
 
 # Install Python packages
-pip install --upgrade pip
 pip install -r requirements.txt
 
 # Install Playwright browser (required for heart-rate effect)
@@ -79,9 +77,9 @@ python -m playwright install chromium
 
 ### Configuration
 The default configuration matches the wiring diagram:
-- **Strip 1**: 896 LEDs on GPIO18 (Pin 12) - 15m section (60 LEDs/meter)
-- **Strip 2**: 894 LEDs on GPIO13 (Pin 33) - 15m section (60 LEDs/meter)
-- **Total**: 1790 LEDs across 30m of WS2813 strips
+- **Strip 1**: 896 LEDs on GPIO18 (Pin 12) - 15m section (~60 LEDs/meter)
+- **Strip 2**: 894 LEDs on GPIO13 (Pin 33) - 15m section (~60 LEDs/meter)
+- **Total**: 1790 LEDs across 30m of WS2813 strips (reduced from 1800 due to damaged LEDs)
 
 To modify the configuration, edit `app/core/truss.py`:
 ```python
@@ -91,7 +89,7 @@ def __init__(self, strip1_count=896, strip2_count=894, strip1_pin=18, strip2_pin
 **Parameters:**
 - `strip1_count` / `strip2_count`: Number of LEDs per strip
 - `strip1_pin` / `strip2_pin`: GPIO pins for data lines
-- `brightness`: Global brightness (0-255)
+- `brightness`: Initial brightness (0-255)
 
 ---
 
@@ -104,8 +102,6 @@ sudo python -m uvicorn app.main:app --host 0.0.0.0 --port 8000
 
 **Important Notes:**
 - `sudo` is required for `rpi_ws281x` to access PWM hardware
-- API documentation available at: `http://<pi-ip>:8000/docs`
-- OpenAPI spec available at: `http://<pi-ip>:8000/openapi.json`
 
 ### Systemd Service (Optional)
 For production deployment, create a systemd service:
@@ -157,7 +153,10 @@ This repository includes example YAML under `home_assistant_config/`:
 - `automations.yaml` keeps the helper light and RGB inputs in sync
 - `lovelace_led_control.yaml` is a dashboard layout for controls
 
-Steps:
+**Prerequisites:**
+- Install `custom:light-entity-card` from HACS for the RGB color picker functionality
+
+**Setup Steps:**
 1. Copy the YAML contents into your Home Assistant configuration (adjust IPs).
 2. Ensure the REST command URL points to your Pi IP.
 3. Reload YAML / restart, then add the Lovelace dashboard JSON as a view.
@@ -173,6 +172,7 @@ Steps:
 - **Heart-rate effect fails**: Install Playwright Chromium (`python -m playwright install chromium`)
 - **API not accessible**: Check firewall settings and ensure port 8000 is open
 - **CORS issues**: Modify `allow_origins` in `app/main.py` for production use
+- **Some LEDs not working**: Individual LEDs may burn out over time; adjust LED count in configuration if needed
 
 ---
 
