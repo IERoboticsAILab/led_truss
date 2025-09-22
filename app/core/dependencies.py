@@ -1,9 +1,17 @@
+"""Dependency container for the shared LED truss controller instance.
+
+The application uses a single controller for its entire lifetime so that
+all requests operate on the same hardware state and effect thread.
+"""
+
 from .truss import truss
 
 # Create a single instance of the truss controller for the application lifetime.
-# This ensures all requests interact with the same hardware controller state.
 _truss_controller_instance = truss()
 
 def get_truss_controller() -> truss:
-    """FastAPI dependency function that returns the shared truss controller instance."""
-    return _truss_controller_instance 
+    """Return the shared truss controller instance.
+
+    This is intended to be used as a FastAPI dependency.
+    """
+    return _truss_controller_instance

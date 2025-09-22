@@ -1,5 +1,5 @@
-import sys
 import json
+import logging
  
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
@@ -9,6 +9,14 @@ from fastapi.responses import JSONResponse
 from app.routers import effects_router, control_router
 from app.effects.effect_loader import get_effects
 from app.core.dependencies import get_truss_controller
+
+
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s %(levelname)s [%(name)s] %(message)s",
+    datefmt="%H:%M:%S",
+)
+logger = logging.getLogger("led_truss")
 
 # --- Application Setup ---
 
@@ -21,9 +29,9 @@ def create_app() -> FastAPI:
     try:
         truss_controller = get_truss_controller()
         truss_controller.clear_all()
-        print("LED Truss controller initialized and cleared.")
+        logger.info("LED Truss controller initialized and cleared.")
     except Exception as e:
-        print(f"WARNING: Failed to initialize or clear LED Truss: {e}")
+        logger.warning("Failed to initialize or clear LED Truss: %s", e)
         # Decide if this should be fatal - for now, allow startup
 
     # --- Create FastAPI App ---    
@@ -37,17 +45,17 @@ def create_app() -> FastAPI:
     # Configure CORS (Cross-Origin Resource Sharing)
     app.add_middleware(
         CORSMiddleware,
-        allow_origins=["*"], # Allow all origins for simplicity (adjust for production)
+        allow_origins=["*"], 
         allow_credentials=True,
-        allow_methods=["*"], # Allow all methods
-        allow_headers=["*"], # Allow all headers
+        allow_methods=["GET", "POST"], # Restrict to needed methods
+        allow_headers=["Content-Type", "Authorization"], # Restrict to needed headers
     )
 
     # --- Include Routers ---
-    print("Including API routers...")
+    logger.info("Including API routers...")
     app.include_router(effects_router.router)
     app.include_router(control_router.router)
-    print("Routers included.")
+    logger.info("Routers included.")
 
     # --- Simple request logger for debugging 422 ---
     @app.middleware("http")
@@ -55,9 +63,9 @@ def create_app() -> FastAPI:
         if request.url.path == "/effects/heart-rate" and request.method == "POST":
             try:
                 body = await request.body()
-                print("/effects/heart-rate payload:", body.decode("utf-8"))
+                logger.debug("/effects/heart-rate payload: %s", body.decode("utf-8"))
             except Exception as e:
-                print("Failed to read request body:", e)
+                logger.debug("Failed to read request body: %s", e)
         response = await call_next(request)
         return response
 
@@ -69,19 +77,24 @@ def create_app() -> FastAPI:
             body_text = body.decode("utf-8")
         except Exception:
             body_text = "<unavailable>"
-        print("Validation error on", request.url.path, "errors=", exc.errors(), "body=", body_text)
+        logger.error("Validation error on %s errors=%s body=%s", request.url.path, exc.errors(), body_text)
         return JSONResponse(status_code=422, content={"detail": exc.errors()})
 
     # (Timer functionality removed)
 
     # --- Root and General Endpoints ---
     @app.get("/", tags=["General"])
-    def read_root():
+    def read_root() -> dict[str, str]:
         """Root endpoint, returns a simple greeting."""
         return {"message": "Welcome to the LED Truss Control API"}
 
+    @app.get("/health", tags=["General"])
+    def health() -> dict[str, str]:
+        """Simple health check endpoint."""
+        return {"status": "ok"}
+
     @app.get("/effects", tags=["General"])
-    def get_effects_metadata():
+    def get_effects_metadata() -> dict:
         """Returns the metadata for all available effects.
         
         Loads the effects map from JSON on the first call.
@@ -103,11 +116,11 @@ def create_app() -> FastAPI:
             tc = get_truss_controller()
             tc.stop_effect()
             tc.clear_all()
-            print("Shutdown: stopped current effect and cleared LEDs.")
+            logger.info("Shutdown: stopped current effect and cleared LEDs.")
         except Exception as e:
-            print(f"Shutdown cleanup error: {e}")
+            logger.warning("Shutdown cleanup error: %s", e)
 
-    print("FastAPI app creation complete.")
+    logger.info("FastAPI app creation complete.")
     return app
 
 # Create the app instance when this module is loaded

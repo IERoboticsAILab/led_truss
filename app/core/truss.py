@@ -1,9 +1,19 @@
+"""Hardware controller and visual effects orchestrator for the LED truss.
+
+This class manages two LED strips as a single logical ring and provides
+methods to run a set of visual effects. Effects run on a background
+thread and can be cancelled when starting a new effect.
+"""
+
 import time
+import logging
 import numpy as np
 import random
 import requests
 import threading
-from rpi_ws281x import *
+from rpi_ws281x import Adafruit_NeoPixel, Color
+
+logger = logging.getLogger("led_truss.truss")
 
 class truss:
     def __init__(self, strip1_count=896, strip2_count=894, strip1_pin=18, strip2_pin=13, freq=800000, dma=10, brightness=125):
@@ -36,34 +46,46 @@ class truss:
                                    1)
 
 
-        self.strip1.begin()
-        self.strip2.begin()
+        try:
+            self.strip1.begin()
+            self.strip2.begin()
+            logger.info(f"LED strips initialized: {self.STRIP1_COUNT} LEDs on GPIO{self.STRIP1_PIN}, {self.STRIP2_COUNT} LEDs on GPIO{self.STRIP2_PIN}")
+        except Exception as e:
+            logger.error(f"Failed to initialize LED strips: {e}")
+            raise
 
         # Effect orchestration
         self._lock = threading.Lock()
         self._cancel_event = threading.Event()
         self._effect_thread = None
 
-    def _run_effect(self, target, args):
+    def _run_effect(self, target, args) -> None:
         try:
             target(*args)
         finally:
             with self._lock:
                 self._effect_thread = None
 
-    def stop_effect(self, timeout=2.0):
+    def stop_effect(self, timeout: float = 2.0) -> None:
         with self._lock:
             thread = self._effect_thread
             if thread is None:
+                logger.debug("stop_effect called but no effect thread is running")
                 return
             self._cancel_event.set()
+        logger.info("Stopping current effect thread with timeout=%s", timeout)
         thread.join(timeout=timeout)
         with self._lock:
             if self._effect_thread is thread:
                 self._effect_thread = None
             self._cancel_event.clear()
+        if thread.is_alive():
+            logger.warning("Effect thread did not stop within timeout")
+        else:
+            logger.info("Effect thread stopped successfully")
 
-    def start_effect(self, effect_name, *args, clear_first=True):
+    def start_effect(self, effect_name: str, *args, clear_first: bool = True) -> None:
+        logger.info("Starting effect '%s' with args=%s clear_first=%s", effect_name, args, clear_first)
         self.stop_effect()
         if clear_first:
             self.clear_all()
@@ -72,6 +94,7 @@ class truss:
             self._cancel_event.clear()
             self._effect_thread = threading.Thread(target=self._run_effect, args=(effect_fn, args), daemon=True)
             self._effect_thread.start()
+        logger.debug("Effect '%s' thread started", effect_name)
 
     # Auxiliary Functions
     def set_pixel_color(self, pixel_index, color):
@@ -82,25 +105,25 @@ class truss:
             pixel_index_new = int(self.STRIP2_COUNT - (pixel_index - self.STRIP1_COUNT)) -1
             self.strip2.setPixelColor(pixel_index_new, color)
                 
-    def show(self):
+    def show(self) -> None:
         self.strip1.show()
         self.strip2.show()
 
-    def set_white_all(self):
+    def set_white_all(self) -> None:
         for i in range(self.LED_COUNT):
             self.set_pixel_color(i, Color(255,255,255))
         self.show()
 
-    def set_color_all(self, color):
+    def set_color_all(self, color: Color) -> None:
         for i in range(self.LED_COUNT):
             self.set_pixel_color(i, color)
         self.show()
 
-    def set_brightness(self, brightness):
+    def set_brightness(self, brightness: int) -> None:
         self.strip1.setBrightness(brightness)
         self.strip2.setBrightness(brightness)
 
-    def clear_all(self):
+    def clear_all(self) -> None:
         for i in range(self.LED_COUNT):
             self.set_pixel_color(i, Color(0,0,0))
         self.show()

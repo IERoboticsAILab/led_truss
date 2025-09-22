@@ -165,7 +165,7 @@
       "url": {
         "type": "string",
         "description": "One or more HTTP(S) URLs (comma-separated) each with a .heartrate element",
-        "default": "https://app.hyperate.io/74524/"
+        "default": "https://app.hyperate.io/15875"
       },
       "poll_interval": {
         "type": "float",

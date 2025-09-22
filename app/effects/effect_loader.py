@@ -1,11 +1,15 @@
+"""Utilities for loading effect metadata from the project root.
+
+The resulting structure is cached in-process to avoid repeated disk I/O.
+"""
+
 import json
-import os
 from typing import Dict, Any
 from pathlib import Path
 
-_effects_map = None
+_effects_map: Dict[str, Any] | None = None
 
-def load_effects_map():
+def load_effects_map() -> Dict[str, Any]:
     global _effects_map
     if _effects_map is None:
         # Assume effects_map.json is in the root directory relative to the 'app' directory
@@ -16,15 +20,8 @@ def load_effects_map():
         if not effects_file.exists():
             raise FileNotFoundError(f"Effects map not found at {effects_file}")
 
-        try:
-            with open(effects_file) as f:
-                _effects_map = json.load(f)
-        except json.JSONDecodeError as e:
-            raise json.JSONDecodeError(
-                f"Failed to parse effects map: {str(e)}",
-                e.doc,
-                e.pos
-            )
+        with open(effects_file) as f:
+            _effects_map = json.load(f)
     return _effects_map
 
 def get_effects() -> Dict[str, Any]:
