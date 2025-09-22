@@ -1,5 +1,8 @@
 ## LED Truss Control API
 
+### Abstract
+This project provides an open, reproducible LED infrastructure for telepresence on an OptiTrack truss. WS2813 strips are mounted to the truss and driven from a Raspberry Pi via a FastAPI service exposing programmable effects and direct color control. The system integrates with Home Assistant and supports non‑invasive human monitoring (e.g., heart rate via Playwright) to map real‑time biosignals to ambient light displays that communicate mood and presence. The emphasis is infrastructure: clear APIs, modular effects, and end‑to‑end setup so anyone can re‑create the installation from scratch.
+
 FastAPI service to control WS281x LED strips mounted on a truss. Provides REST endpoints for direct color control and several animated visual effects, including integrations for Home Assistant and a heart‑rate visualization.
 
 ### Features
@@ -207,7 +210,7 @@ Effects endpoints (see `GET /effects` for full parameter schemas):
 - `POST /effects/rainbow-cycle` — `{ "wait_ms": 50 }`
 - `POST /effects/theater-chase` — `{ "color": {..} | null, "wait_ms": 50 }`
 - `POST /effects/running` — `{ "wait_ms": 10, "width": 1 }`
-- `POST /effects/heart-rate` — `{ "url": "https://...", "poll_interval": 1.0, "min_hr": 40, "yellow_start": 75, "red_start": 120, "max_hr": 200 }`
+- `POST /effects/heart-rate` — `{ "url": "https://...", "poll_interval": 1.0, "min_hr": 40, "yellow_start": 75, "red_start": 120, "max_hr": 200, "pulse": true }`
 
 Notes:
 - Start a new effect to stop the previous one automatically.
